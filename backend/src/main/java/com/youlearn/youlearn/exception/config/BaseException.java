@@ -1,30 +1,32 @@
 package com.youlearn.youlearn.exception.config;
 
+import org.springframework.http.HttpStatus;
+
 public abstract class BaseException extends RuntimeException {
 
-    private final String errorCode;
+    private final HttpStatus httpStatus;
     private final String message;
 
-    public BaseException(String errorCode, String message) {
+    public BaseException(HttpStatus httpStatus, String message) {
         super(message);
-        this.errorCode = errorCode;
+        this.httpStatus = httpStatus;
         this.message = message;
     }
 
-    public BaseException(String errorCode, String message, Throwable cause) {
+    public BaseException(HttpStatus httpStatus, String message, Throwable cause) {
         super(cause);
-        this.errorCode = errorCode;
+        this.httpStatus = httpStatus;
         this.message = message;
     }
 
     public BaseException(Throwable cause) {
         super(cause);
-        this.errorCode = "internal.server.error";
+        this.httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
         this.message = "Internal Server Error";
     }
 
-    public String getErrorCode() {
-        return errorCode;
+    public HttpStatus getHttpStatus() {
+        return httpStatus;
     }
 
     @Override

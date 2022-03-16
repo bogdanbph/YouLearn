@@ -43,7 +43,7 @@ public class EmailService implements Predicate<String> {
         }
         catch (MessagingException ex) {
             LOGGER.error("Failed to send the email", ex);
-            throw new BadRequestException("400", "Failed to send the email");
+            throw new BadRequestException("Failed to send the email", ex);
         }
     }
 }

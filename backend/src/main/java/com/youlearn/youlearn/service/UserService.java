@@ -35,7 +35,7 @@ public class UserService implements UserDetailsService {
 
         // TODO: check if user is in database, but he didnt confirmed yet.
         if (present) {
-            throw new BadRequestException("400", "Email is already present in database.");
+            throw new BadRequestException("Email is already present in database.");
         }
         String password = passwordEncoder.encode(user.getPassword());
         user.setPassword(password);

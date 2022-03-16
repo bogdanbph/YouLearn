@@ -27,7 +27,7 @@ public class RegistrationService {
     public String registerUser(RegistrationRequest request) {
         boolean isValid = emailService.test(request.getEmail());
         if (!isValid) {
-            throw new BadRequestException("400", "Email format is not correct.");
+            throw new BadRequestException("Email format is not correct.");
         }
         String tokenString = userService.signUp(
                 new User(request.getFirstName(),
@@ -45,14 +45,14 @@ public class RegistrationService {
     @Transactional
     public String confirmToken(String tokenString) {
         Token token = tokenService.getToken(tokenString)
-                .orElseThrow(() -> new BadRequestException("400", "Token not found in database."));
+                .orElseThrow(() -> new BadRequestException("Token not found in database."));
         if (token.getConfirmedAt() != null) {
-            throw new BadRequestException("400", "The email is already confirmed.");
+            throw new BadRequestException("The email is already confirmed.");
         }
 
         LocalDateTime expiredAt = token.getExpiredAt();
         if (expiredAt.isBefore(LocalDateTime.now())) {
-            throw new BadRequestException("400", "The token is expired!");
+            throw new BadRequestException("The token is expired!");
         }
 
         tokenService.setConfrimedAt(tokenString);

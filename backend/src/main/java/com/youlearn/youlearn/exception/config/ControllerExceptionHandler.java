@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,13 +25,17 @@ public class ControllerExceptionHandler {
 
     private static Logger log = LoggerFactory.getLogger(ControllerExceptionHandler.class);
 
-    @ExceptionHandler({BadRequestException.class})
-    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-    public ResponseEntity<ErrorResponseDto> handleBadRequest(BadRequestException exception) {
-        return createErrorResponse(exception, HttpStatus.BAD_REQUEST, exception.getErrorCode(),
-                exception.getMessage());
-    }
+    @ExceptionHandler({BaseException.class})
+    public ResponseEntity<ErrorResponseDto> handleBadRequest(BaseException exception) {
+        log.error(exception.getMessage(), exception);
 
+        ErrorResponseDto errorResponseDto = new ErrorResponseDto(exception.getMessage(),
+                exception.getHttpStatus(),
+                LocalDateTime.now());
+
+        return new ResponseEntity<>(errorResponseDto, exception.getHttpStatus());
+    }
+/*
     @ExceptionHandler({UnauthorizedException.class})
     @ResponseStatus(value = HttpStatus.UNAUTHORIZED)
     public ResponseEntity<ErrorResponseDto> handleUnauthorized(UnauthorizedException exception) {
@@ -72,16 +77,6 @@ public class ControllerExceptionHandler {
 
         return createErrorResponse(throwable, HttpStatus.INTERNAL_SERVER_ERROR, "internal.server.error",
                 "Internal Server Error");
-    }
-
-    private ResponseEntity<ErrorResponseDto> createErrorResponse(Throwable throwable, HttpStatus status, String errorCode, String errorMessage) {
-        log.warn(throwable.getMessage(), throwable);
-
-        ErrorResponseDto dto = new ErrorResponseDto();
-        dto.setStatus(status.value());
-        dto.setCode(errorCode);
-        dto.setMessage(errorMessage);
-        return ResponseEntity.status(status.value()).body(dto);
-    }
+    }*/
 
 }

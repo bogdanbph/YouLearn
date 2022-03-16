@@ -1,12 +1,30 @@
 package com.youlearn.youlearn.dto;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import org.springframework.http.HttpStatus;
 
-@Data
-@NoArgsConstructor
+import java.time.LocalDateTime;
+
 public class ErrorResponseDto {
-    private Integer status;
-    private String code;
-    private String message;
+
+    private final String message;
+    private final HttpStatus httpStatus;
+    private final LocalDateTime localDateTime;
+
+    public ErrorResponseDto(String message, HttpStatus httpStatus, LocalDateTime localDateTime) {
+        this.message = message;
+        this.httpStatus = httpStatus;
+        this.localDateTime = localDateTime;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public HttpStatus getHttpStatus() {
+        return httpStatus;
+    }
+
+    public LocalDateTime getLocalDateTime() {
+        return localDateTime;
+    }
 }
