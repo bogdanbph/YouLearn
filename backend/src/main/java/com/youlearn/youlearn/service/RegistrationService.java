@@ -6,8 +6,9 @@ import com.youlearn.youlearn.model.Token;
 import com.youlearn.youlearn.model.User;
 import com.youlearn.youlearn.model.UserRole;
 import lombok.RequiredArgsConstructor;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +17,8 @@ import java.time.LocalDateTime;
 @Service
 @RequiredArgsConstructor
 public class RegistrationService {
+
+    private final Logger logger = LogManager.getLogger(RegistrationService.class);
 
     private final EmailService emailService;
     private final UserService userService;
@@ -26,19 +29,33 @@ public class RegistrationService {
 
     public String registerUser(RegistrationRequest request) {
         boolean isValid = emailService.test(request.getEmail());
+        boolean isValidPassword = request.getPassword().matches("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$");
+
         if (!isValid) {
             throw new BadRequestException("Email format is not correct.");
         }
-        String tokenString = userService.signUp(
-                new User(request.getFirstName(),
-                        request.getLastName(),
-                        request.getEmail(),
-                        request.getPassword(),
-                        UserRole.valueOf(request.getRole()))
-        );
+
+        if (!isValidPassword) {
+            logger.error("Password format is not correct.");
+            throw new BadRequestException("Password format is not correct.");
+        }
+
+        User user = new User(request.getFirstName(),
+                request.getLastName(),
+                request.getEmail(),
+                request.getPassword(),
+                UserRole.valueOf(request.getRole()));
+        String tokenString = userService.signUp(user);
 
         String link = String.format("http://localhost:%s/api/v1/register/confirm?token=%s", port, tokenString);
-        emailService.send(request.getEmail(), buildEmail(request.getFirstName(), link));
+
+        try {
+            emailService.send(request.getEmail(), buildEmail(request.getFirstName(), link));
+        }
+        catch (Exception ex) {
+            userService.deleteUser(user);
+            throw new BadRequestException(ex.getMessage());
+        }
         return tokenString;
     }
 

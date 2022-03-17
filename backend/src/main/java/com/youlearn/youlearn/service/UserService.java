@@ -5,6 +5,9 @@ import com.youlearn.youlearn.model.Token;
 import com.youlearn.youlearn.model.User;
 import com.youlearn.youlearn.repository.UserRepository;
 import lombok.AllArgsConstructor;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -12,7 +15,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
+import java.util.*;
 
 import static com.youlearn.youlearn.utils.Constants.USER_NOT_FOUND_MSG;
 
@@ -24,10 +27,30 @@ public class UserService implements UserDetailsService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final TokenService tokenService;
 
+    private final Logger logger = LogManager.getLogger(UserService.class);
+
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException(String.format(USER_NOT_FOUND_MSG, email)));
+
+        logger.info("Loading user by email from database...");
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+        if (optionalUser.isEmpty()) {
+            throw new UsernameNotFoundException(String.format(USER_NOT_FOUND_MSG, email));
+        }
+
+        User user = optionalUser.get();
+        Collection<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(user.getRole().name()));
+
+        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), authorities);
+    }
+
+    public User getUserByEmail(String email) {
+        Optional<User> byEmail = userRepository.findByEmail(email);
+        if (byEmail.isEmpty()) {
+            throw new UsernameNotFoundException(String.format(USER_NOT_FOUND_MSG, email));
+        }
+
+        return byEmail.get();
     }
 
     public String signUp(User user) {
@@ -54,7 +77,12 @@ public class UserService implements UserDetailsService {
         return tokenString;
     }
 
-    public int enableUser(String email) {
-        return userRepository.enableAppUser(email);
+    public void deleteUser(User user) {
+        userRepository.delete(user);
+        tokenService.deleteTokenByUserId(user.getId());
+    }
+
+    public void enableUser(String email) {
+        userRepository.enableAppUser(email);
     }
 }

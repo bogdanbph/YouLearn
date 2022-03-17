@@ -21,4 +21,6 @@ public interface TokenRepository extends JpaRepository<Token, Long> {
             "SET t.confirmedAt = ?2 " +
             "WHERE t.token = ?1")
     int updateConfirmedAt(String token, LocalDateTime now);
+
+    void deleteByUserId(Long userId);
 }

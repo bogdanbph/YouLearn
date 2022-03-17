@@ -1,29 +1,18 @@
 package com.youlearn.youlearn.exception.config;
 
 import com.youlearn.youlearn.dto.ErrorResponseDto;
-import com.youlearn.youlearn.exception.BadRequestException;
-import com.youlearn.youlearn.exception.NotFoundException;
-import com.youlearn.youlearn.exception.UnauthorizedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
-import org.springframework.validation.ObjectError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @ControllerAdvice
 public class ControllerExceptionHandler {
 
-    private static Logger log = LoggerFactory.getLogger(ControllerExceptionHandler.class);
+    private final static Logger log = LoggerFactory.getLogger(ControllerExceptionHandler.class);
 
     @ExceptionHandler({BaseException.class})
     public ResponseEntity<ErrorResponseDto> handleBadRequest(BaseException exception) {
