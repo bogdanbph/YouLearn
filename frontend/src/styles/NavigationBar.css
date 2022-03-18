@@ -1,0 +1,51 @@
+.navbar {
+    background-color: rgb(255, 255, 255);
+    height: auto;
+    width: 100%;
+    flex-direction: row;
+    margin-top: 1%;
+    position: fixed;
+}
+
+.navbar-nav,
+.navbar-light .nav-link {
+    /* padding-left: 5%; */
+    color: #000 !important;
+    transition: all 0.5s;
+}
+
+.navbar-nav,
+.navbar-light .nav-link:hover {
+    color: gold !important;
+}
+
+.nav-link:hover {
+    border-bottom: 2px solid gold;
+}
+
+.navbar-brand {
+    font-size: 1.4em;
+    color: black;
+    transition: all 0.5s;
+    float: right;
+}
+
+.navbar-brand:hover {
+    color: gold !important;
+
+}
+.navbar {
+    border-radius: 30px;    
+}
+
+.customNav {
+    margin-left: 80%;
+}
+
+.logo {
+    width: 15%;
+    height: 100%;
+    display: inline;
+    margin-left: -18%;
+    margin-top: -16%;
+}
