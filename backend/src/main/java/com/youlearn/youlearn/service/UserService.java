@@ -7,7 +7,6 @@ import com.youlearn.youlearn.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -38,10 +37,7 @@ public class UserService implements UserDetailsService {
             throw new UsernameNotFoundException(String.format(USER_NOT_FOUND_MSG, email));
         }
 
-        User user = optionalUser.get();
-        Collection<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(user.getRole().name()));
-
-        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), authorities);
+        return optionalUser.get();
     }
 
     public User getUserByEmail(String email) {

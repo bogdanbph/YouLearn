@@ -44,7 +44,8 @@ public class RegistrationService {
                 request.getLastName(),
                 request.getEmail(),
                 request.getPassword(),
-                UserRole.valueOf(request.getRole()));
+                UserRole.valueOf(request.getRole()),
+                request.getGender());
         String tokenString = userService.signUp(user);
 
         String link = String.format("http://localhost:%s/api/v1/register/confirm?token=%s", port, tokenString);

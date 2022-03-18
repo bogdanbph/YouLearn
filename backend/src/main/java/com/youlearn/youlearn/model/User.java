@@ -35,6 +35,7 @@ public class User implements UserDetails {
     private String lastName;
     private String email;
     private String password;
+    private String gender;
 
     @Enumerated(EnumType.STRING)
     private UserRole role;
@@ -42,12 +43,13 @@ public class User implements UserDetails {
     private Boolean isLocked = false;
     private Boolean isEnabled = false;
 
-    public User(String firstName, String lastName, String email, String password, UserRole role) {
+    public User(String firstName, String lastName, String email, String password, UserRole role, String gender) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.password = password;
         this.role = role;
+        this.gender = gender;
     }
 
     @Override

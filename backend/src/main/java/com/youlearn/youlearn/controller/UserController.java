@@ -7,6 +7,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+
 @RestController
 @RequestMapping("/user")
 @RequiredArgsConstructor
@@ -14,8 +17,8 @@ public class UserController {
 
     private final UserService userService;
 
-    @GetMapping
-    public ResponseEntity<UserDetails> getUserByEmail(@RequestBody String email) {
-        return new ResponseEntity<>(userService.loadUserByUsername(email), HttpStatus.OK);
+    @PostMapping
+    public ResponseEntity<UserDetails> getUserByEmail(@RequestParam("email") String email) {
+        return new ResponseEntity<>(userService.loadUserByUsername(URLDecoder.decode(email, StandardCharsets.UTF_8)), HttpStatus.OK);
     }
 }
