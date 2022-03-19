@@ -1,0 +1,23 @@
+#common-body-courses {
+    margin-top: 3%;
+    margin-left: 10%;
+}
+
+#java-vid {
+    margin-left: 19%;
+}
+
+ul { 
+    list-style-type: none;
+}
+
+.content-card {
+    margin-top: 5%;
+}
+
+.description-card{
+    margin-top: 2%;
+    margin-left: 9%;
+    margin-right: 10%;
+    text-align: center;
+}

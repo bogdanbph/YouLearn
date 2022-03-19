@@ -1,9 +1,8 @@
 import React from 'react';
-import LoginForm from './components/LoginForm';
 import LoginService from './service/LoginService';
-import {Route, Routes, Navigate} from 'react-router-dom';
-import HomePage from './components/HomePage';
-import ProfilePage from './components/ProfilePage';
+import { ToastContainer, toast } from 'react-toastify';
+import CustomRoutes from './components/CustomRoutes';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   const handleLogin = details => {
@@ -14,23 +13,35 @@ function App() {
         window.location.href = "/"
       })
       .catch(ex => {
-        console.log(ex);
+        toast.error("Login failed! " + ex.response.data.message, {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined
+        });
       });
   }
 
   const handleLogout = () => {
-    localStorage.removeItem('user');
+    localStorage.clear();
     window.location.href = '/login';
   }
 
   return (
     <div className="App">
-      {/* {(user.username !== "") && <LoginForm login={handleLogin} error={error}/>} */}
-      <Routes>
-        <Route exact path="/login" element={<LoginForm login={handleLogin}/>}/>
-        <Route path="/" element={<HomePage logout={handleLogout}/>}/>
-        <Route path="/profile" element={localStorage.getItem('user') ? <ProfilePage logout={handleLogout}/> :  <Navigate to="/"/>}/>
-      </Routes>
+      <CustomRoutes login={handleLogin} logout={handleLogout}/>
+      <ToastContainer position="top-right"
+                    autoClose={5000}
+                    hideProgressBar={false}
+                    newestOnTop={false}
+                    closeOnClick
+                    rtl={false}
+                    pauseOnFocusLoss
+                    draggable
+                    pauseOnHover/>
     </div>
   );
 }

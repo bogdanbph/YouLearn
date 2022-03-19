@@ -1,6 +1,7 @@
 form {
     display: block;
     position: relative;
+    background-color: rgba(255, 255, 255, 0.8);
 }
 
 form:after {
@@ -39,7 +40,6 @@ form .form-inner .form-group {
 .form-inner .form-group label {
     display: block;
     color: #666;
-    font-size: 12px;
     margin-bottom: 5px;
     transition: 0.4s;
 }
@@ -58,7 +58,7 @@ form .form-inner .form-group input {
 }
 
 form .form-inner .form-group input:focus {
-    box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.2);
+    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 form .form-inner input[type="submit"]:hover {
@@ -84,4 +84,8 @@ form {
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+#register-button {
+    margin-left: 5%;
 }

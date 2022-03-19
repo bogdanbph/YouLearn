@@ -1,6 +1,7 @@
 import { Container, Nav, Navbar } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.css';
 import '../styles/NavigationBar.css';
+import brand from '../assets/brand.png';
 
 const NavigationBar = (props) => {
 
@@ -17,7 +18,7 @@ const NavigationBar = (props) => {
         <Navbar expand="lg" sticky="top" className="custom-navbar py-0">
             <Container>
                 <Navbar.Brand href="/" className="brand">
-                    You Learn <img alt="logo" className="logo"/>
+                    You Learn <img alt="logo" src={brand} className="logo"/>
                 </Navbar.Brand>
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">
@@ -25,6 +26,9 @@ const NavigationBar = (props) => {
                         
                             {localStorage.getItem('user') ? 
                                 <>
+                                    <Nav.Item href="/courses">
+                                        <Nav.Link href="/courses">Courses</Nav.Link>    
+                                    </Nav.Item>
                                     <Nav.Item href="/profile">
                                         <Nav.Link href='/profile'>Profile</Nav.Link>
                                     </Nav.Item>

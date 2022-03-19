@@ -13,8 +13,13 @@
     border-image-source: linear-gradient(to right, #ffce00 50%, #ffce00 50%, #fe4880);
 }
 
-.common-body {
+#common-body-profile {
+    display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
+}
+
+.card {
+    background-color: rgba(255, 255, 255, 0.8);
 }

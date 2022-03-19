@@ -4,6 +4,8 @@ import React from "react";
 import stockprofilepic from '../assets/stockprofilepic.jpg';
 import stockprofilepic_female from '../assets/stockprofilepic_female.jpg';
 import '../styles/ProfilePage.css';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 class ProfilePage extends React.Component {
 
@@ -43,16 +45,31 @@ class ProfilePage extends React.Component {
                 });
             })
             .catch(ex => {
-                console.log(ex);
+                toast.error("Profile info could not be retrieved! " + ex.response.data.message, {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined
+                });
+
+                if (ex.response.data.message.includes('expire')) {
+                    setTimeout(function() {
+                        localStorage.clear();
+                        window.location.href="/login";
+                    }, 2500);
+                }
             })
         }
     }
 
     render() {
         return (
-            <div className="profilePage">
+            <div className="profile-page">
                 <NavigationBar logout={this.props.logout}/>
-                <div className="common-body">
+                <div className="common-body" id="common-body-profile">
                     <div className="card" style={{width:'18rem'}}>
                         {this.state.info}
                     </div>
