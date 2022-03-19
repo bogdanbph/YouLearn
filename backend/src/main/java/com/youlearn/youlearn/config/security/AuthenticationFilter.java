@@ -10,6 +10,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import javax.servlet.FilterChain;
@@ -35,16 +36,21 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
-        if (userService.getUserByEmail(request.getParameter("username")).isEnabled()) {
+        try {
+            if (userService.getUserByEmail(request.getParameter("username")).isEnabled()) {
 
-            String username = request.getParameter("username");
-            String password = request.getParameter("password");
+                String username = request.getParameter("username");
+                String password = request.getParameter("password");
 
-            UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(username, password);
-            return authenticationManager.authenticate(usernamePasswordAuthenticationToken);
+                UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(username, password);
+                return authenticationManager.authenticate(usernamePasswordAuthenticationToken);
+            }
+            else {
+                throw new BadRequestException("Account is not confirmed");
+            }
         }
-        else {
-            throw new BadRequestException("Account is not confirmed");
+        catch (UsernameNotFoundException exception) {
+            throw new BadRequestException(exception.getMessage());
         }
     }
 
