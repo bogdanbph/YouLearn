@@ -3,7 +3,9 @@ package com.youlearn.youlearn.controller;
 import com.youlearn.youlearn.dto.RegistrationRequest;
 import com.youlearn.youlearn.service.RegistrationService;
 import lombok.AllArgsConstructor;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 @RestController
 @RequestMapping(path = "/register")
@@ -19,7 +21,10 @@ public class RegistrationController {
     }
 
     @GetMapping(path = "/confirm")
-    public String confirm(@RequestParam("token") String token) {
-        return registrationService.confirmToken(token);
+    public ModelAndView confirm(@RequestParam("token") String token) {
+        registrationService.confirmToken(token);
+        ModelMap modelMap = new ModelMap();
+        modelMap.addAttribute("confirmed", true);
+        return new ModelAndView("redirect:" + "http://localhost:3000/confirmed", modelMap);
     }
 }
