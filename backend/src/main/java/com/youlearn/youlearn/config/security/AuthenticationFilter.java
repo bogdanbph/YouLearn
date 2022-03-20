@@ -6,6 +6,7 @@ import com.youlearn.youlearn.exception.BadRequestException;
 import com.youlearn.youlearn.model.User;
 import com.youlearn.youlearn.service.UserService;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -49,7 +50,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
                 throw new BadRequestException("Account is not confirmed");
             }
         }
-        catch (UsernameNotFoundException exception) {
+        catch (UsernameNotFoundException | BadCredentialsException exception) {
             throw new BadRequestException(exception.getMessage());
         }
     }
