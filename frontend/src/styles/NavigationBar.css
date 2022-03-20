@@ -31,19 +31,20 @@
 }
 
 .navbar-brand:hover {
-    color: gold !important;
-
+    filter: invert(89%) sepia(20%) saturate(2986%) brightness(98%) contrast(107%);
 }
+
 .navbar {
     border-radius: 30px;    
 }
 
 .customNav {
-    margin-left:90%;
+    margin-left:80%;
 }
 
 .logo {
     width: 12%;
     display: inline;
     margin-left: -32%;
+    transition: all 0.5s;
 }

@@ -10,10 +10,10 @@ import ConfirmedAccountPage from './ConfirmedAccountPage';
 export default function CustomRoutes(props) {
     return (
       <Routes>
-        <Route exact path="/login" element={<LoginForm login={props.login}/>}/>
+        <Route exact path="/login" element={!localStorage.getItem('user') ? <LoginForm login={props.login}/> : <Navigate to="/"/>}/>
         <Route path="/" element={<HomePage logout={props.logout}/>}/>
         <Route path="/profile" element={localStorage.getItem('user') ? <ProfilePage logout={props.logout}/> :  <Navigate to="/"/>}/>
-        <Route exact path="/register" element={<RegisterForm/>}/>
+        <Route exact path="/register" element={!localStorage.getItem('user') ? <RegisterForm/> : <Navigate to="/"/>}/>
         <Route path="/courses" element={localStorage.getItem('user') ? <CoursesPage logout={props.logout}/> :  <Navigate to="/"/>}/>
         <Route path="/confirmed" element={window.location.search.includes("confirmed") ? <ConfirmedAccountPage logout={props.logout}/> :  <Navigate to="/"/>}/>
       </Routes>

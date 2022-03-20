@@ -3,6 +3,8 @@ import '../styles/LoginForm.css';
 import RegisterService from '../service/RegisterService';
 import { toast } from 'react-toastify';
 import NavigationBar from './NavigationBar';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faInfoCircle } from '@fortawesome/fontawesome-free-solid';
 
 const RegisterForm = (props) => {
     const [details, setDetails] = useState({firstName:"", lastName:"", email:"", password:"", gender:"male", role: "REGULAR_USER"});
@@ -58,7 +60,7 @@ const RegisterForm = (props) => {
                         <input type="text" name="email" id="email" onChange={e => setDetails({...details, email: e.target.value})} value={details.email}/>
                     </div>
                     <div className="form-group">
-                        <label htmlFor="password">Password: </label>
+                        <label htmlFor="password">Password: <FontAwesomeIcon icon={faInfoCircle} title="The password should contain one capital letter, one number and at least 8 characters."/></label>
                         <input type="password" name="password" id="password" onChange={e => setDetails({...details, password: e.target.value})} value={details.password}/>
                     </div>
                     <div className="form-group">
