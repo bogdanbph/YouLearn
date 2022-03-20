@@ -2,7 +2,12 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: montserrat, sans-serif;
+    font-family: 'Luminari', fantasy;
+    font-size: large;
+}
+
+body {
+    background-image: linear-gradient(to bottom right, #ffce00, #FE4880);
 }
 
 input, button {
@@ -21,13 +26,11 @@ h2 {
 
 h2 span {
     color: #fe4880;
-    font-weight: 700;
+    font-size: x-large;
 }
 
 .common-body {
     height: 100vh;
     padding-top: 10vh;
-    display: flex;
     justify-content: center;
-    background-color: #53565a;
 }

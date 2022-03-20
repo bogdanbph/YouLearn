@@ -2,6 +2,7 @@ package com.youlearn.youlearn.config;
 
 import com.youlearn.youlearn.config.security.AuthenticationFilter;
 import com.youlearn.youlearn.config.security.AuthorizationFilter;
+import com.youlearn.youlearn.config.security.ExceptionHandlerFilter;
 import com.youlearn.youlearn.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,6 +31,7 @@ import java.util.Properties;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final BCryptPasswordEncoder passwordEncoder;
     private final UserService userService;
+    private final ExceptionHandlerFilter exceptionHandlerFilter;
 
     @Value("${spring.mail.username}")
     private String email;
@@ -58,6 +60,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .anyRequest().authenticated();
         http.addFilter(new AuthenticationFilter(authenticationManager(), userService));
         http.addFilterBefore(new AuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(exceptionHandlerFilter, AuthorizationFilter.class);
     }
 
     @Bean

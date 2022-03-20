@@ -1,5 +1,5 @@
 .navbar {
-    background-color: rgb(255, 255, 255);
+    background-color: rgba(255, 255, 255, 0.8);
     height: auto;
     width: 100%;
     flex-direction: row;
@@ -46,6 +46,5 @@
     width: 15%;
     height: 100%;
     display: inline;
-    margin-left: -18%;
-    margin-top: -16%;
+    margin-left: -52%;
 }

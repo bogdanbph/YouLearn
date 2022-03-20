@@ -8,8 +8,8 @@ const HomePage = (props) => {
         <div className="welcome">
             <NavigationBar logout={props.logout}/>
 
-            <div className="common-body">
-                <h2>Welcome{localStorage.getItem('user') ? <span>, {localStorage.getItem('user').split('@')[0]}!</span> : '!'}</h2>
+            <div className="common-body" id="common-body-home">
+                <h2 id='welcome-text'>Welcome{localStorage.getItem('user') ? <span>, {localStorage.getItem('user').split('@')[0]}!</span> : '!'}</h2>
             </div>
         </div>
     );

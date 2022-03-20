@@ -1,0 +1,8 @@
+#welcome-text {
+    text-shadow: 2px 2px gray;
+}
+
+#common-body-home {
+    display: flex;
+    align-items: center;
+}

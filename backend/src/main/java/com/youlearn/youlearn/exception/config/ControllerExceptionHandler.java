@@ -3,16 +3,17 @@ package com.youlearn.youlearn.exception.config;
 import com.youlearn.youlearn.dto.ErrorResponseDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
 
-@ControllerAdvice
+@RestControllerAdvice
 public class ControllerExceptionHandler {
 
-    private final static Logger log = LoggerFactory.getLogger(ControllerExceptionHandler.class);
+    private static final Logger log = LoggerFactory.getLogger(ControllerExceptionHandler.class);
 
     @ExceptionHandler({BaseException.class})
     public ResponseEntity<ErrorResponseDto> handleBadRequest(BaseException exception) {
@@ -23,6 +24,17 @@ public class ControllerExceptionHandler {
                 LocalDateTime.now());
 
         return new ResponseEntity<>(errorResponseDto, exception.getHttpStatus());
+    }
+
+    @ExceptionHandler({RuntimeException.class})
+    public ResponseEntity<ErrorResponseDto> handleBadRequest(RuntimeException exception) {
+        log.error(exception.getMessage(), exception);
+
+        ErrorResponseDto errorResponseDto = new ErrorResponseDto(exception.getMessage(),
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                LocalDateTime.now());
+
+        return new ResponseEntity<>(errorResponseDto, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 /*
     @ExceptionHandler({UnauthorizedException.class})
