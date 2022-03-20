@@ -45,7 +45,8 @@ class ProfilePage extends React.Component {
                 });
             })
             .catch(ex => {
-                toast.error("Profile info could not be retrieved! " + ex.response.data.message, {
+                const errorMessage = ex.response !== undefined ? ex.response.data.message : "Backend is down!";
+                toast.error("Profile info could not be retrieved! " + errorMessage, {
                     position: "top-right",
                     autoClose: 5000,
                     hideProgressBar: false,
@@ -55,7 +56,7 @@ class ProfilePage extends React.Component {
                     progress: undefined
                 });
 
-                if (ex.response.data.message.includes('expire')) {
+                if (ex.response !== undefined && ex.response.data.message.includes('expire')) {
                     setTimeout(function() {
                         localStorage.clear();
                         window.location.href="/login";

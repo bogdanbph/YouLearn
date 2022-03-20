@@ -4,6 +4,7 @@ import ProfilePage from './ProfilePage';
 import LoginForm from './LoginForm';
 import RegisterForm from './RegisterForm';
 import CoursesPage from './CoursesPage';
+import ConfirmedAccountPage from './ConfirmedAccountPage';
 
 
 export default function CustomRoutes(props) {
@@ -14,6 +15,7 @@ export default function CustomRoutes(props) {
         <Route path="/profile" element={localStorage.getItem('user') ? <ProfilePage logout={props.logout}/> :  <Navigate to="/"/>}/>
         <Route exact path="/register" element={<RegisterForm/>}/>
         <Route path="/courses" element={localStorage.getItem('user') ? <CoursesPage logout={props.logout}/> :  <Navigate to="/"/>}/>
+        <Route path="/confirmed" element={window.location.search.includes("confirmed") ? <ConfirmedAccountPage logout={props.logout}/> :  <Navigate to="/"/>}/>
       </Routes>
     );
 }

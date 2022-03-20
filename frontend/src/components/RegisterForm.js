@@ -26,7 +26,8 @@ const RegisterForm = (props) => {
             }, 2000);
         })
         .catch(ex => {
-            toast.error("Register failed! " + ex.response.data.message, {
+            const errorMessage = ex.response !== undefined ? ex.response.data.message : "Backend is down!";
+            toast.error("Register failed! " + errorMessage, {
                 position: "top-right",
                 autoClose: 5000,
                 hideProgressBar: false,

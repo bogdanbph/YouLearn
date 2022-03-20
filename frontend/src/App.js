@@ -13,7 +13,8 @@ function App() {
         window.location.href = "/"
       })
       .catch(ex => {
-        toast.error("Login failed! " + ex.response.data.message, {
+        const errorMessage = ex.response !== undefined ? ex.response.data.message : "Backend is down!";
+        toast.error("Login failed! " + errorMessage, {
             position: "top-right",
             autoClose: 5000,
             hideProgressBar: false,
