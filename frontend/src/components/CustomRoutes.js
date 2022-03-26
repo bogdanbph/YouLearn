@@ -17,7 +17,7 @@ export default function CustomRoutes(props) {
         <Route exact path="/register" element={!localStorage.getItem('user') ? <RegisterForm/> : <Navigate to="/"/>}/>
         <Route path="/courses" element={localStorage.getItem('user') ? <CoursesPage logout={props.logout}/> :  <Navigate to="/"/>}/>
         <Route path="/confirmed" element={window.location.search.includes("confirmed") ? <ConfirmedAccountPage logout={props.logout}/> :  <Navigate to="/"/>}/>
-        <Route path="/courses/:courseId" element={localStorage.getItem('user') ? <CoursePage logout={props.logout}/> :  <Navigate to="/"/>}/>
+        <Route path="/courses/:courseId" element={localStorage.getItem('user') ? <CoursePage {...props} logout={props.logout}/> :  <Navigate to="/"/>}/>
 
       </Routes>
     );

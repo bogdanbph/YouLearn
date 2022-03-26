@@ -45,14 +45,13 @@ class CoursesPage extends React.Component {
                         let thumbnailLink = "https://img.youtube.com/vi/" + course.courseYoutubeId + "/1.jpg";
                         await this.checkEnrolled(course.id);
 
-                        console.log(this.state);
                         return <div key={course.id} className="grid-item">
                                 <div className="card" style={{width:'18rem', height:'auto'}}>
                                     <div className="content-card">
                                         <p className="description-card"><h3>{course.courseName}</h3> ({course.numberOfChapters} chapters)</p>
                                         {/* <iframe onLoad={this.handleOnclick} id="java-vid" width="200" height="200" src={course.link} title={course.title} frameBorder={0} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>                         */}
                                         <img src={thumbnailLink} height={'150px'} id="course-image"></img>
-                                        <p className="description-card"><br></br>${course.price.toFixed(2)}&nbsp;&nbsp;&nbsp; <button className="btn btn-warning" onClick={() => this.handleEnroll(course.id)} >{this.state.availability.get(course.id) ? 'Continue' : 'Enroll'}</button></p>
+                                        <p className="description-card"><br></br>${course.price.toFixed(2)}&nbsp;&nbsp;&nbsp; <button className="btn btn-warning" onClick={() => this.handleEnroll(course.id, course.courseYoutubeId)} >{this.state.availability.get(course.id) ? 'Continue' : 'Enroll'}</button></p>
                                     </div>
                                 </div>
                             </div>;
@@ -82,7 +81,7 @@ class CoursesPage extends React.Component {
         }
     }
 
-    handleEnroll = async (courseId) => {
+    handleEnroll = async (courseId, courseYoutubeId) => {
         if (this.state.availability.get(courseId) == false) {
             await CourseService.enroll(courseId, localStorage.getItem("user"), localStorage.getItem("token"))
                 .then(() => {
@@ -122,7 +121,7 @@ class CoursesPage extends React.Component {
                 })
         }
         else {
-            window.location.href = "/courses/" + courseId;
+            window.location.href = "/courses/" + courseYoutubeId;
         }
     }
 

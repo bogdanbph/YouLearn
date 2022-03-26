@@ -53,6 +53,15 @@ class CourseService {
                 }
             });
     }
+
+    checkValidPlaylist(playlistId, token) {
+        return axios.get(COURSE_API_URL + "/" + playlistId,
+        {
+            headers: {
+                'Authorization': 'Bearer ' + token
+            }
+        });
+    }
 }
 
 export default new CourseService();

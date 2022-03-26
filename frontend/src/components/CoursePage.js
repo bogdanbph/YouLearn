@@ -1,7 +1,7 @@
-import { render } from "@testing-library/react";
 import React, { useState } from "react";
-import styles from '../styles/CoursePage.css';
 import NavigationBar from "./NavigationBar";
+import { toast } from 'react-toastify';
+import CourseService from "../service/CourseService";
 
 const YOUTUBE_PLAYLIST_ITEMS_API = "https://www.googleapis.com/youtube/v3/playlistItems";
 
@@ -14,21 +14,50 @@ class CoursePage extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            body: []
+            body: [],
+            available: false
         }
     }
 
-    componentDidMount() {
-        this.renderData();
+    async componentDidMount() {
+        const playlistId = window.location.pathname.split('/')[2];
+        await this.checkValidPlaylist(playlistId);
+        if (this.state.available === true) {
+            await this.renderData(playlistId);
+        }
+        else {
+            toast.error("Course unavailable with id: " + playlistId, {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined
+            });
+            setTimeout(function() {
+                window.location.href = '/courses'
+            }, 2500);
+        }
     }
 
-    renderData = async () => {
-        const playlistId = "PLBlnK6fEyqRjKA_NuK9mHmlk0dZzuP1P5";
+    checkValidPlaylist = async (playlistId) => {
+        await CourseService.checkValidPlaylist(playlistId, localStorage.getItem('token'))
+        .then(res => {
+            this.setState({
+                available: res.data
+            })
+        })
+        .catch(ex => {
+            console.log(ex);
+        })
+    }
+
+    renderData = async (playlistId) => {
         const apiKey = "AIzaSyB6qwQn6L_VW8PSINSFDuQSQrSboDv2PfA";
         await fetch(`${YOUTUBE_PLAYLIST_ITEMS_API}?part=snippet&maxResults=50&playlistId=${playlistId}&key=${apiKey}`)
         .then(async res => {
             const data = await res.json();
-            console.log(await data);
 
             this.setState({
                 body: <main className="course-container">
@@ -38,7 +67,6 @@ class CoursePage extends React.Component {
 
                     <ul className="chapters">
                         {data.items.map((item) => {
-                            console.log(item);
                             const { id, snippet = {} } = item;
                             const { title, thumbnails = {}, resourceId } = snippet;
                             const { medium = {} } = thumbnails;
