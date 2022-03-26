@@ -44,4 +44,10 @@ public class CourseController {
     public void enrollUser(@RequestBody CourseUserDto courseUserDto) {
         courseService.enrollUser(courseUserDto.getEmail(), courseUserDto.getCourseId());
     }
+
+    @GetMapping
+    @RequestMapping("/{courseId}")
+    public ResponseEntity<Boolean> findByCourseYoutubeId(@PathVariable("courseId") String courseId) {
+        return new ResponseEntity<>(courseService.findCourseByCourseYoutubeId(courseId), HttpStatus.OK);
+    }
 }

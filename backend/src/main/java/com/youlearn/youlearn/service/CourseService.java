@@ -107,4 +107,8 @@ public class CourseService {
 
         return userOptional.get();
     }
+
+    public Boolean findCourseByCourseYoutubeId(String courseYoutubeId) {
+        return courseRepository.findByCourseYoutubeId(courseYoutubeId).isPresent();
+    }
 }
