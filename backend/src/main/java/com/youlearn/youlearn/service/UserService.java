@@ -3,11 +3,11 @@ package com.youlearn.youlearn.service;
 import com.youlearn.youlearn.exception.BadRequestException;
 import com.youlearn.youlearn.model.Token;
 import com.youlearn.youlearn.model.User;
+import com.youlearn.youlearn.model.UserRole;
 import com.youlearn.youlearn.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -29,7 +29,7 @@ public class UserService implements UserDetailsService {
     private final Logger logger = LogManager.getLogger(UserService.class);
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+    public User loadUserByUsername(String email) throws UsernameNotFoundException {
 
         logger.info("Loading user by email from database...");
         Optional<User> optionalUser = userRepository.findByEmail(email);
@@ -80,5 +80,16 @@ public class UserService implements UserDetailsService {
 
     public void enableUser(String email) {
         userRepository.enableAppUser(email);
+    }
+
+    public UserRole getUserRoleForUser(String email) {
+        Optional<User> userOptional = userRepository.findByEmail(email);
+
+        if (userOptional.isPresent()) {
+            return userOptional.get().getRole();
+        }
+        else {
+            throw new BadRequestException("User not present in database.");
+        }
     }
 }

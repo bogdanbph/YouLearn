@@ -1,5 +1,6 @@
 package com.youlearn.youlearn.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,11 +13,13 @@ import javax.persistence.*;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
+import java.util.Set;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @Entity
+@JsonIgnoreProperties({"enrollments"})
 public class User implements UserDetails {
 
     @Id
@@ -42,6 +45,9 @@ public class User implements UserDetails {
 
     private Boolean isLocked = false;
     private Boolean isEnabled = false;
+
+    @OneToMany(mappedBy = "user")
+    private Set<CourseEnrollment> enrollments;
 
     public User(String firstName, String lastName, String email, String password, UserRole role, String gender) {
         this.firstName = firstName;

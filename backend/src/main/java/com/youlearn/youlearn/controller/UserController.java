@@ -1,5 +1,6 @@
 package com.youlearn.youlearn.controller;
 
+import com.youlearn.youlearn.model.UserRole;
 import com.youlearn.youlearn.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,5 +21,10 @@ public class UserController {
     @PostMapping
     public ResponseEntity<UserDetails> getUserByEmail(@RequestParam("email") String email) {
         return new ResponseEntity<>(userService.loadUserByUsername(URLDecoder.decode(email, StandardCharsets.UTF_8)), HttpStatus.OK);
+    }
+
+    @PostMapping("/role")
+    public ResponseEntity<UserRole> getRoleForUser(@RequestParam("email") String email) {
+        return new ResponseEntity<>(userService.getUserRoleForUser(email), HttpStatus.OK);
     }
 }
