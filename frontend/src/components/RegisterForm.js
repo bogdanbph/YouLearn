@@ -65,12 +65,17 @@ const RegisterForm = (props) => {
                     </div>
                     <div className="form-group">
                         <label htmlFor="gender">Gender: </label>
-                        <select name="gender" id="gender" onChange={e => {
-                            console.log(e.target.value);
-                            setDetails({...details, gender: e.target.value})
-                        }} value={details.gender}>
+                        <select name="gender" id="gender" onChange={e => setDetails({...details, gender: e.target.value})} value={details.gender}>
                             <option value="male">Male</option>
                             <option value="female">Female</option>
+                        </select>
+                    </div>
+                    <div className="form-group">
+                        <label htmlFor="role">Subscription type: </label>
+                        <select name="role" id="role" onChange={e => setDetails({...details, role: e.target.value})} value={details.role}>
+                            <option value="REGULAR_USER">Free</option>
+                            <option value="PREMIUM_USER">Premium</option>
+                            <option value="INSTRUCTOR">Instructor</option>
                         </select>
                     </div>
                     <input type="submit" value="REGISTER"/>

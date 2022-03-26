@@ -7,7 +7,9 @@
 }
 
 body {
-    background-image: linear-gradient(to bottom right, #ffce00, #FE4880);
+    background-image: linear-gradient(to right, #ffce00, #FE4880);
+    background-size: 100% 10000px;
+    background-repeat:repeat-y;
 }
 
 input, button {

@@ -56,13 +56,28 @@ class ProfilePage extends React.Component {
                     progress: undefined
                 });
 
-                if (ex.response !== undefined && ex.response.data.message.includes('expire')) {
+                if (ex.response !== undefined && ex.response.data.message.includes('expire') || ex.response.data.message.includes('There is no user')) {
                     setTimeout(function() {
                         localStorage.clear();
                         window.location.href="/login";
                     }, 2500);
                 }
             })
+        }
+        else {
+            toast.error("No token present in localStorage. Redirected to login page! ", {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined
+            });
+            setTimeout(function() {
+                localStorage.clear();
+                window.location.href="/login";
+            }, 2500);
         }
     }
 

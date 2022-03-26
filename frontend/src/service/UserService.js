@@ -15,6 +15,18 @@ class UserService {
                 }
             });
     }
+
+    retrieveRoleForUser(email, token) {
+        return axios.post(USER_SERVICE_API_URL + "/role", 
+            new URLSearchParams({
+                email: email
+            }),
+            {
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            });
+    }
 }
 
 export default new UserService();

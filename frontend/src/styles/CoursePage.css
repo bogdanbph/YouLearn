@@ -1,0 +1,10 @@
+.chapters li {
+    border: 1px solid red;
+    
+    margin: 2% 0;
+}
+
+.chapter-info {
+    padding-left: 2%;
+    padding-top: 1%;
+}
