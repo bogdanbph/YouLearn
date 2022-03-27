@@ -1,113 +1,130 @@
 #common-body-courses {
-    margin-top: 3%;
-    margin-left: 14%;
-    overflow: auto;
+  margin-top: 3%;
+  margin-left: 14%;
+  overflow: auto;
 }
 
 #java-vid {
-    margin-left: 19%;
+  margin-left: 19%;
 }
 
-ul { 
-    list-style-type: none;
+ul {
+  list-style-type: none;
 }
 
 .content-card {
-    margin-top: 5%;
+  margin-top: 5%;
 }
 
-.description-card{
-    margin-top: 2%;
-    margin-left: 9%;
-    margin-right: 10%;
-    text-align: center;
+.description-card {
+  margin-top: 2%;
+  margin-left: 9%;
+  margin-right: 10%;
+  text-align: center;
 }
 
 #course-image {
-    margin-left: auto;
-    margin-right: auto;
-    display: block;
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
 }
 
 .grid-container {
-    -webkit-column-count: 3;
-    -moz-column-count: 3;
-    column-count: 4;
-    display: grid;
-    row-gap: 50px;
-    grid-template-columns: repeat(3, 1fr);
+  -webkit-column-count: 3;
+  -moz-column-count: 3;
+  column-count: 4;
+  display: grid;
+  row-gap: 50px;
+  grid-template-columns: repeat(3, 1fr);
+  align-items: center;
+}
+
+@media (max-width: 1200px) {
+  .grid-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 1000px) {
+  .grid-container {
+    grid-template-columns: repeat(1, 1fr);
+  }
 }
 
 #add-course {
-    display: inline-block;
-    padding: 10px 15px;
-    border-radius: 8px;
-    background-image: linear-gradient(to right, #b9b8b3 50%, #b9b8b3 50%, #ffffff);
-    background-size: 200%;
-    background-position: 0%;
-    transition: 0.4s;
-    color: #fff;
-    cursor: pointer;
-    margin-top: 10%;
-    margin-left: 5%;
-    position:fixed;
-    left:10px;
-    bottom:10px;
+  display: inline-block;
+  padding: 10px 15px;
+  border-radius: 8px;
+  background-image: linear-gradient(
+    to right,
+    #b9b8b3 50%,
+    #b9b8b3 50%,
+    #ffffff
+  );
+  background-size: 200%;
+  background-position: 0%;
+  transition: 0.4s;
+  color: #fff;
+  cursor: pointer;
+  margin-top: 10%;
+  margin-left: 5%;
+  position: fixed;
+  left: 10px;
+  bottom: 10px;
 }
 
 #add-course:focus {
-    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 #add-course:hover {
-    background-position: 100% 0%;
+  background-position: 100% 0%;
 }
 
 .add-course {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 
-    border: 1px solid #ccc;
-    background: #fff;
-    overflow: auto;
-    border-radius: 4px;
-    outline: none;
-    padding: 20px;
-    height: 700px;
-    width: 600px;
+  border: 1px solid #ccc;
+  background: #fff;
+  overflow: auto;
+  border-radius: 4px;
+  outline: none;
+  padding: 20px;
+  height: 700px;
+  width: 600px;
 }
 
 #form-add-course {
-    height: 600px;
-    width: 500px;
-    margin: 0 auto; 
-
+  height: 600px;
+  width: 500px;
+  margin: 0 auto;
 }
 
 #header-form {
-    text-align: center;
+  text-align: center;
 }
 
 .myoverlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.75);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.75);
 }
 
 .ReactModal__Overlay {
-    opacity: 0;
-    transition: opacity 500ms ease-in-out;
+  opacity: 0;
+  transition: opacity 500ms ease-in-out;
 }
 
 .ReactModal__Overlay--after-open {
-    opacity: 1;
+  opacity: 1;
 }
 
 .ReactModal__Overlay--before-close {
-    opacity: 0;
+  opacity: 0;
 }

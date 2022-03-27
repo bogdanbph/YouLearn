@@ -1,38 +1,39 @@
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Luminari', fantasy;
-    font-size: large;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Luminari", fantasy;
+  font-size: large;
 }
 
 body {
-    background-image: linear-gradient(to right, #ffce00, #FE4880);
-    background-size: 100% 10000px;
-    background-repeat:repeat-y;
+  background-image: linear-gradient(to right, #ffce00, #fe4880);
+  background-size: 100% 10000px;
+  background-repeat: repeat-y;
 }
 
-input, button {
-    appearance: none;
-    background: none;
-    border: none;
-    outline: none;
+input,
+button {
+  appearance: none;
+  background: none;
+  border: none;
+  outline: none;
 }
 
 h2 {
-    color: rgb(175, 175, 175);
-    font-size: 28px;
-    font-weight: 500;
-    margin-bottom: 30px;
+  color: rgb(175, 175, 175);
+  font-size: 28px;
+  font-weight: 500;
+  margin-bottom: 30px;
 }
 
 h2 span {
-    color: #fe4880;
-    font-size: x-large;
+  color: #fe4880;
+  font-size: x-large;
 }
 
 .common-body {
-    height: 100vh;
-    padding-top: 10vh;
-    justify-content: center;
+  height: 100vh;
+  padding-top: 10vh;
+  justify-content: center;
 }

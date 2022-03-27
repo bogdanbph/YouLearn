@@ -1,10 +1,21 @@
-.chapters li {
-    border: 1px solid red;
-    
-    margin: 2% 0;
-}
-
 .chapter-info {
+    border: 2px solid red;
+    border-radius: 2em;
+    margin: 2% 0;
     padding-left: 2%;
     padding-top: 1%;
+    margin-right: 2%;
+}
+
+.mark-complete {
+    display: inline-block;
+    padding: 10px 15px;
+    border-radius: 8px;
+    background-image: linear-gradient(to right, #b9b8b3 50%, #b9b8b3 50%, #ffffff);
+    background-size: 200%;
+    background-position: 0%;
+    transition: 0.4s;
+    color: #fff;
+    cursor: pointer;
+    margin-left: 35%;
 }

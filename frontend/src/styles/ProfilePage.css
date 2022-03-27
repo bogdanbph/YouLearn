@@ -1,25 +1,30 @@
 .card {
-    height: 50%;
+  height: 50%;
 }
 
 #profile-pic {
-    width: 100px;
-    height: 100px;
-    margin-left: 32%;
-    margin-top: 2%;
-    border: 10px solid;
-    border-image-slice: 1;
-    border-width: 5px;
-    border-image-source: linear-gradient(to right, #ffce00 50%, #ffce00 50%, #fe4880);
+  width: 100px;
+  height: 100px;
+  margin-left: 32%;
+  margin-top: 2%;
+  border: 10px solid;
+  border-image-slice: 1;
+  border-width: 5px;
+  border-image-source: linear-gradient(
+    to right,
+    #ffce00 50%,
+    #ffce00 50%,
+    #fe4880
+  );
 }
 
 #common-body-profile {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 
 .card {
-    background-color: rgba(255, 255, 255, 0.8);
+  background-color: rgba(255, 255, 255, 0.8);
 }
