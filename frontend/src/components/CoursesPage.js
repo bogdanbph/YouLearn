@@ -4,6 +4,8 @@ import "../styles/CoursesPage.css";
 import CourseService from "../service/CourseService";
 import Modal from "react-modal";
 import { toast } from "react-toastify";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faInfoCircle } from "@fortawesome/fontawesome-free-solid";
 
 class CoursesPage extends React.Component {
   constructor() {
@@ -42,9 +44,10 @@ class CoursesPage extends React.Component {
           this.setState({
             courses: await Promise.all(
               courses.map(async (course) => {
+                const urlParams = new URL(course.courseYoutubeId);
                 let thumbnailLink =
                   "https://img.youtube.com/vi/" +
-                  course.courseYoutubeId +
+                  urlParams.searchParams.get("v") +
                   "/1.jpg";
                 await this.checkEnrolled(course.id);
 
@@ -72,7 +75,8 @@ class CoursesPage extends React.Component {
                             onClick={() =>
                               this.handleEnroll(
                                 course.id,
-                                course.courseYoutubeId
+                                urlParams.searchParams.get("list"),
+                                course.courseName
                               )
                             }
                           >
@@ -118,7 +122,7 @@ class CoursesPage extends React.Component {
     }
   };
 
-  handleEnroll = async (courseId, courseYoutubeId) => {
+  handleEnroll = async (courseId, courseYoutubeId, courseName) => {
     if (this.state.availability.get(courseId) == false) {
       await CourseService.enroll(
         courseId,
@@ -167,7 +171,11 @@ class CoursesPage extends React.Component {
           }
         });
     } else {
-      window.location.href = "/courses/" + courseYoutubeId;
+      window.location.href =
+        "/courses/playlistId=" +
+        courseYoutubeId +
+        "&playlistName=" +
+        courseName.replace(" ", "-");
     }
   };
 
@@ -210,21 +218,54 @@ class CoursesPage extends React.Component {
 
   handleSubmit = async (event) => {
     event.preventDefault();
-    console.log(this.state);
-    if (localStorage.getItem("token")) {
-      await CourseService.uploadCourse(
-        this.state.modalDetails,
-        localStorage.getItem("token")
-      )
-        .then((res) => {
-          this.retrieveCourses();
-        })
-        .catch((ex) => {
-          const errorMessage =
-            ex.response !== undefined
-              ? ex.response.data.message
-              : "Backend is down!";
-          toast.error("Courses page could not be loaded! " + errorMessage, {
+
+    var expression =
+      /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi;
+    var regex = new RegExp(expression);
+    if (
+      this.state.modalDetails.courseLink.match(regex) &&
+      this.state.modalDetails.courseName.length > 3 &&
+      this.state.modalDetails.numberOfChapters > 0 &&
+      this.state.modalDetails.description.length > 25
+    ) {
+      if (localStorage.getItem("token")) {
+        await CourseService.uploadCourse(
+          this.state.modalDetails,
+          localStorage.getItem("token")
+        )
+          .then((res) => {
+            this.retrieveCourses();
+          })
+          .catch((ex) => {
+            const errorMessage =
+              ex.response !== undefined
+                ? ex.response.data.message
+                : "Backend is down!";
+            toast.error("Courses page could not be loaded! " + errorMessage, {
+              position: "top-right",
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+            });
+
+            if (
+              ex.response !== undefined &&
+              ex.response.data.message.includes("expire")
+            ) {
+              setTimeout(function () {
+                localStorage.clear();
+                window.location.href = "/login";
+              }, 2500);
+            }
+          });
+        this.setState({ showModal: false });
+      } else {
+        toast.error(
+          "No token present in localStorage. Redirected to login page! ",
+          {
             position: "top-right",
             autoClose: 5000,
             hideProgressBar: false,
@@ -232,36 +273,23 @@ class CoursesPage extends React.Component {
             pauseOnHover: true,
             draggable: true,
             progress: undefined,
-          });
-
-          if (
-            ex.response !== undefined &&
-            ex.response.data.message.includes("expire")
-          ) {
-            setTimeout(function () {
-              localStorage.clear();
-              window.location.href = "/login";
-            }, 2500);
           }
-        });
-      this.setState({ showModal: false });
+        );
+        setTimeout(function () {
+          localStorage.clear();
+          window.location.href = "/login";
+        }, 2500);
+      }
     } else {
-      toast.error(
-        "No token present in localStorage. Redirected to login page! ",
-        {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-        }
-      );
-      setTimeout(function () {
-        localStorage.clear();
-        window.location.href = "/login";
-      }, 2500);
+      toast.error("Recheck the requirements for each field.", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
     }
   };
 
@@ -293,7 +321,13 @@ class CoursesPage extends React.Component {
           <form id="form-add-course">
             <div className="form-inner">
               <div className="form-group">
-                <label htmlFor="course-name">Name: </label>
+                <label htmlFor="course-name">
+                  Name:{" "}
+                  <FontAwesomeIcon
+                    icon={faInfoCircle}
+                    title="The course name should have at least 3 characters."
+                  />
+                </label>
                 <input
                   type="text"
                   name="course-name"
@@ -310,7 +344,13 @@ class CoursesPage extends React.Component {
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="number-chapters">Number of chapters: </label>
+                <label htmlFor="number-chapters">
+                  Number of chapters:{" "}
+                  <FontAwesomeIcon
+                    icon={faInfoCircle}
+                    title="You should have at least one chapter."
+                  />
+                </label>
                 <input
                   type="number"
                   name="number-chapters"
@@ -327,7 +367,13 @@ class CoursesPage extends React.Component {
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="course-link">Course Playlist Link: </label>
+                <label htmlFor="course-link">
+                  Course Playlist Link:{" "}
+                  <FontAwesomeIcon
+                    icon={faInfoCircle}
+                    title="It should be a valid HTTPS link. Please add here the link from your first chapter including the playlistId. E.g.: https://www.youtube.com/watch?v=VHbSopMyc4M&list=PLBlnK6fEyqRjKA_NuK9mHmlk0dZzuP1P5"
+                  />
+                </label>
                 <input
                   type="text"
                   name="course-link"
@@ -361,7 +407,13 @@ class CoursesPage extends React.Component {
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="course-description">Description: </label>
+                <label htmlFor="course-description">
+                  Description:{" "}
+                  <FontAwesomeIcon
+                    icon={faInfoCircle}
+                    title="The description should contain at least 25 characters."
+                  />
+                </label>
                 <input
                   type="text"
                   name="course-description"

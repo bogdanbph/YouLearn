@@ -19,10 +19,14 @@ class CoursePage extends React.Component {
   }
 
   async componentDidMount() {
-    const playlistId = window.location.pathname.split("/")[2];
+    const playlistUrl = window.location.pathname.split("/")[2];
+    console.log(playlistUrl);
+    const playlistId = playlistUrl.split("=")[1].split("&")[0];
+    const playlistName = playlistUrl.split("=")[2].replace("-", " ");
+
     await this.checkValidPlaylist(playlistId);
     if (this.state.available === true) {
-      await this.renderData(playlistId);
+      await this.renderData(playlistId, playlistName);
     } else {
       toast.error("Course unavailable with id: " + playlistId, {
         position: "top-right",
@@ -54,7 +58,7 @@ class CoursePage extends React.Component {
       });
   };
 
-  renderData = async (playlistId) => {
+  renderData = async (playlistId, playlistName) => {
     await fetch(
       `${YOUTUBE_PLAYLIST_ITEMS_API}?part=snippet&maxResults=50&playlistId=${playlistId}&key=${process.env.REACT_APP_API_YOUTUBE}`
     ).then(async (res) => {
@@ -64,7 +68,7 @@ class CoursePage extends React.Component {
         body: (
           <main className="course-container">
             <h1 className="course-title" style={{ marginLeft: "10%" }}>
-              My playlist
+              {playlistName}
             </h1>
 
             <ul className="chapters">
@@ -80,11 +84,24 @@ class CoursePage extends React.Component {
 
                 const shortDescription = description.substring(0, 250);
                 const dots = "...";
-                const restOfDescription = description.substring(251);
+                const restOfDescription = description.substring(250);
 
                 return (
                   <li key={id} className="chapter-info">
                     {/* ={`https://www.youtube.com/watch?v=${resourceId.videoId}`} */}
+                    <button
+                      className="mark-complete"
+                      style={{
+                        float: "right",
+                        marginRight: "20%",
+                        marginTop: "5%",
+                      }}
+                      onClick={() =>
+                        this.handleCompleteChapter(resourceId.videoId)
+                      }
+                    >
+                      Mark as Complete
+                    </button>
                     <a
                       href={`https://www.youtube.com/watch?v=${resourceId.videoId}`}
                     >
@@ -96,16 +113,6 @@ class CoursePage extends React.Component {
                           src={medium.url}
                           alt=""
                         />
-                        <button
-                          className="mark-complete"
-                          style={{
-                            float: "right",
-                            marginRight: "20%",
-                            marginTop: "3%",
-                          }}
-                        >
-                          Mark as Complete
-                        </button>
                       </p>
                     </a>
                     <p style={{ display: "inline-block" }}>
@@ -133,6 +140,10 @@ class CoursePage extends React.Component {
       });
     });
   };
+
+  handleCompleteChapter(id) {
+    console.log(id);
+  }
 
   handleReadMode(id) {
     let moreText = document.getElementById("more" + id);
