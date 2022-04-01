@@ -12,18 +12,18 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @Entity
-@JsonIgnoreProperties({"user", "course"})
-public class CourseEnrollment {
+@JsonIgnoreProperties({"user", "chapter"})
+public class ChapterEnrollment {
 
     @Id
     @SequenceGenerator(
-            name = "course_enrollment_sequence",
-            sequenceName = "course_enrollment_sequence",
+            name = "chapter_enrollment_sequence",
+            sequenceName = "chapter_enrollment_sequence",
             allocationSize = 1
     )
     @GeneratedValue(
             strategy = GenerationType.SEQUENCE,
-            generator = "course_enrollment_sequence"
+            generator = "chapter_enrollment_sequence"
     )
     private Long id;
 
@@ -35,8 +35,8 @@ public class CourseEnrollment {
     @JoinColumn(name = "course_id")
     private Course course;
 
-    LocalDateTime registeredAt;
+    private String chapterUrl;
+
     LocalDateTime completedAt;
-    boolean isCertificationObtained;
 
 }
