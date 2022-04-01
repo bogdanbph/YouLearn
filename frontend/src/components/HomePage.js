@@ -49,6 +49,8 @@ class HomePage extends React.Component {
             ) : (
               "!"
             )}
+            <br />
+            Student Progress Tracker App
           </h2>
         </div>
       </div>

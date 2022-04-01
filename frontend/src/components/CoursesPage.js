@@ -76,7 +76,8 @@ class CoursesPage extends React.Component {
                               this.handleEnroll(
                                 course.id,
                                 urlParams.searchParams.get("list"),
-                                course.courseName
+                                course.courseName,
+                                course.numberOfChapters
                               )
                             }
                           >
@@ -94,7 +95,6 @@ class CoursesPage extends React.Component {
           });
         })
         .catch((ex) => {
-          console.log(ex);
           const errorMessage =
             ex.response !== undefined
               ? ex.response.data.message
@@ -122,7 +122,7 @@ class CoursesPage extends React.Component {
     }
   };
 
-  handleEnroll = async (courseId, courseYoutubeId, courseName) => {
+  handleEnroll = async (courseId, courseYoutubeId, courseName, chapters) => {
     if (this.state.availability.get(courseId) == false) {
       await CourseService.enroll(
         courseId,
@@ -145,7 +145,6 @@ class CoursesPage extends React.Component {
           }, 2500);
         })
         .catch((ex) => {
-          console.log(ex);
           const errorMessage =
             ex.response !== undefined
               ? ex.response.data.message
@@ -174,6 +173,8 @@ class CoursesPage extends React.Component {
       window.location.href =
         "/courses/playlistId=" +
         courseYoutubeId +
+        "&chapters=" +
+        chapters +
         "&playlistName=" +
         courseName.replace(" ", "-");
     }
@@ -189,7 +190,6 @@ class CoursesPage extends React.Component {
         this.state.availability.set(courseId, res.data);
       })
       .catch((ex) => {
-        console.log(ex);
         const errorMessage =
           ex.response !== undefined
             ? ex.response.data.message

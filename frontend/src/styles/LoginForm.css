@@ -78,7 +78,7 @@ form .form-inner input[type="submit"] {
   background-size: 200%;
   background-position: 0%;
   transition: 0.4s;
-  color: #fff;
+  color: #000;
   font-weight: 700;
   cursor: pointer;
 }
