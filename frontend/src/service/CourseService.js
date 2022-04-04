@@ -169,6 +169,44 @@ class CourseService {
       }
     );
   }
+
+  retrieveQuestions(token, courseId) {
+    return axios.get(ASSESSMENT_API_URL + "/questions?courseId=" + courseId, {
+      headers: {
+        Authorization: "Bearer " + token,
+      },
+    });
+  }
+
+  submitAssessment(token, courseId, questions, email) {
+    return axios.post(
+      ASSESSMENT_API_URL + "/submit",
+      {
+        courseId: courseId,
+        questions: questions,
+        email: email,
+      },
+      {
+        headers: {
+          Authorization: "Bearer " + token,
+        },
+      }
+    );
+  }
+
+  isAssessmentTaken(token, email, courseId) {
+    return axios.post(
+      COURSE_API_URL + "/assessment?courseId=" + courseId,
+      {
+        email: email,
+      },
+      {
+        headers: {
+          Authorization: "Bearer " + token,
+        },
+      }
+    );
+  }
 }
 
 export default new CourseService();

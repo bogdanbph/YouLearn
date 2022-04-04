@@ -1,30 +1,75 @@
-.card {
-  height: 50%;
+#profile-info {
+  height: fit-content;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-#profile-pic {
-  width: 100px;
-  height: 100px;
-  margin-left: 32%;
-  margin-top: 2%;
-  border: 10px solid;
-  border-image-slice: 1;
-  border-width: 5px;
-  border-image-source: linear-gradient(
-    to right,
-    #ffce00 50%,
-    #ffce00 50%,
-    #fe4880
-  );
+.certifications {
+  width: 100%;
 }
 
 #common-body-profile {
   display: flex;
-  align-items: center;
+  margin-left: auto;
+  margin-top: auto;
   justify-content: center;
-  text-align: center;
 }
 
 .card {
   background-color: rgba(255, 255, 255, 0.8);
+
+  margin-top: 4%;
+  height: fit-content;
+  width: fit-content;
+}
+
+#certification-info {
+  margin-top: 17%;
+  padding-top: 1%;
+  width: fit-content;
+  height: fit-content;
+}
+
+.certifications {
+  display: grid;
+  row-gap: 50px;
+  margin-left: 1%;
+  grid-template-columns: repeat(3, 1fr);
+  column-gap: 50px;
+  align-items: center;
+}
+
+@media (max-width: 1200px) {
+  .certifications {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 1000px) {
+  .certifications {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}
+
+.certification-list-item {
+  padding-left: 1%;
+  padding-top: 1%;
+  padding-right: 1%;
+  padding-bottom: 1%;
+}
+.certification-list-item li {
+  border-bottom: 5px solid rgb(248, 131, 131);
+}
+
+.certification-list-item li:last-child {
+  border-bottom: none;
+}
+
+#no-certifications {
+  color: black;
+  text-decoration: none;
+}
+
+#no-certifications:hover {
+  color: rgb(250, 211, 139);
 }

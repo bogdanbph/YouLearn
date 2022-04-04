@@ -6,6 +6,7 @@ import Modal from "react-modal";
 import { toast } from "react-toastify";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faInfoCircle } from "@fortawesome/fontawesome-free-solid";
+import UserService from "../service/UserService";
 
 class CoursesPage extends React.Component {
   constructor() {
@@ -29,6 +30,37 @@ class CoursesPage extends React.Component {
   }
 
   async componentDidMount() {
+    await UserService.retrieveUserProfile(
+      localStorage.getItem("user"),
+      localStorage.getItem("token")
+    )
+      .then()
+      .catch((ex) => {
+        const errorMessage =
+          ex.response !== undefined
+            ? ex.response.data.message
+            : "Backend is down!";
+        toast.error("Profile info could not be retrieved! " + errorMessage, {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+
+        if (
+          (ex.response !== undefined &&
+            ex.response.data.message.includes("expire")) ||
+          ex.response.data.message.includes("There is no user")
+        ) {
+          setTimeout(function () {
+            localStorage.clear();
+            window.location.href = "/login";
+          }, 2500);
+        }
+      });
     await this.retrieveCourses();
 
     Modal.setAppElement("body");
@@ -226,7 +258,8 @@ class CoursesPage extends React.Component {
       this.state.modalDetails.courseLink.match(regex) &&
       this.state.modalDetails.courseName.length > 3 &&
       this.state.modalDetails.numberOfChapters > 0 &&
-      this.state.modalDetails.description.length > 25
+      this.state.modalDetails.description.length > 25 &&
+      this.state.modalDetails.price >= 0
     ) {
       if (localStorage.getItem("token")) {
         await CourseService.uploadCourse(

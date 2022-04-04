@@ -30,6 +30,20 @@ class UserService {
       }
     );
   }
+
+  retrieveCertifications(email, token) {
+    return axios.post(
+      USER_SERVICE_API_URL + "/certifications",
+      new URLSearchParams({
+        email: email,
+      }),
+      {
+        headers: {
+          Authorization: "Bearer " + token,
+        },
+      }
+    );
+  }
 }
 
 export default new UserService();

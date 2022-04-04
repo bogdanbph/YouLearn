@@ -6,6 +6,7 @@ import RegisterForm from "./RegisterForm";
 import CoursesPage from "./CoursesPage";
 import ConfirmedAccountPage from "./ConfirmedAccountPage";
 import CoursePage from "./CoursePage";
+import ConfirmGradePage from "./ConfirmGradePage";
 
 export default function CustomRoutes(props) {
   return (
@@ -22,6 +23,7 @@ export default function CustomRoutes(props) {
         }
       />
       <Route path="/" element={<HomePage logout={props.logout} />} />
+      <Route path="*" element={<Navigate to="/" />} />
       <Route
         path="/profile"
         element={
@@ -54,6 +56,16 @@ export default function CustomRoutes(props) {
         element={
           window.location.search.includes("confirmed") ? (
             <ConfirmedAccountPage logout={props.logout} />
+          ) : (
+            <Navigate to="/" />
+          )
+        }
+      />
+      <Route
+        path="/grade"
+        element={
+          window.location.search.includes("grade") ? (
+            <ConfirmGradePage logout={props.logout} />
           ) : (
             <Navigate to="/" />
           )

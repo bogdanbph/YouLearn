@@ -33,6 +33,9 @@ class CoursePage extends React.Component {
       modalQuestionsTexts: ["", "", "", "", ""],
       showCreateAssessmentModal: false,
       showTakeAssessmentModal: false,
+      questions: [""],
+      questionsTexts: ["", "", "", "", ""],
+      isAssessmentTaken: false,
     };
   }
 
@@ -53,6 +56,18 @@ class CoursePage extends React.Component {
     if (this.state.isCourseValid === true) {
       await this.renderData(playlistId, playlistName, chapters);
 
+      // await CourseService.isAssessmentTaken(
+      //   localStorage.getItem("user"),
+      //   localStorage.getItem("token"),
+      //   playlistId
+      // )
+      //   .then((res) => {
+      //     this.setState({
+      //       isAssessmentTaken: res.data,
+      //     });
+      //   })
+      //   .catch();
+
       await CourseService.checkIfCertificationIsObtained(
         localStorage.getItem("user"),
         localStorage.getItem("token"),
@@ -62,7 +77,10 @@ class CoursePage extends React.Component {
           isCertificationObtained: res.data,
         });
 
-        if (this.state.isCertificationObtained === true) {
+        if (
+          this.state.isCertificationObtained === true ||
+          this.state.isAssessmentTaken === true
+        ) {
           document.getElementById("take-assessment").style.display = "none";
         }
       });
@@ -121,12 +139,42 @@ class CoursePage extends React.Component {
         })
         .catch((ex) => {});
 
+      console.log(this.state);
+      if (this.state.existsAssessment === true) {
+        await CourseService.isAssessmentTaken(
+          localStorage.getItem("token"),
+          localStorage.getItem("user"),
+          playlistId
+        )
+          .then((res) => {
+            this.setState({
+              isAssessmentTaken: res.data,
+            });
+          })
+          .catch((ex) => {});
+
+        if (this.state.isAssessmentTaken === false) {
+          await CourseService.retrieveQuestions(
+            localStorage.getItem("token"),
+            playlistId
+          )
+            .then((res) => {
+              this.setState({
+                questions: res.data,
+                numberOfQuestions: res.data.length,
+              });
+            })
+            .catch((ex) => {});
+        }
+      }
+
       if (
         this.state.existsAssessment === false &&
         this.state.instrutorEmail === localStorage.getItem("user")
       ) {
         document.getElementById("create-assessment").style.display = "block";
       } else {
+        console.log(document.getElementById("create-assessment"));
         document.getElementById("create-assessment").style.display = "none";
       }
     } else {
@@ -144,6 +192,8 @@ class CoursePage extends React.Component {
       }, 2500);
     }
   }
+
+  componentDidUpdate() {}
 
   checkValidPlaylist = async (playlistId) => {
     await CourseService.checkValidPlaylist(
@@ -379,9 +429,14 @@ class CoursePage extends React.Component {
   }
 
   async handleCompleteCourse() {
-    if (this.state.existsAssessment === true) {
+    console.log(this.state);
+    if (
+      this.state.existsAssessment === true &&
+      this.state.isAssessmentTaken === false
+    ) {
       this.setState({ showTakeAssessmentModal: true });
     } else {
+      console.log(this.state);
       await CourseService.completeCourse(
         localStorage.getItem("user"),
         localStorage.getItem("token"),
@@ -444,7 +499,6 @@ class CoursePage extends React.Component {
   async handleSubmitCreateAssessment(e) {
     e.preventDefault();
     let questions = [];
-    console.log(this.state);
     for (let i = 0; i <= this.state.numberOfQuestions - 1; i++) {
       if (
         this.state.modalQuestionsTexts[i] === "" ||
@@ -462,59 +516,117 @@ class CoursePage extends React.Component {
             progress: undefined,
           }
         );
+        return;
       } else {
         questions.push(
           this.state.modalQuestions[i] +
             "##" +
             this.state.modalQuestionsTexts[i]
         );
-
-        await CourseService.addAssessment(
-          localStorage.getItem("token"),
-          this.state.courseId,
-          questions
-        )
-          .then(() => {
-            this.setState({
-              showCreateAssessmentModal: false,
-            });
-            toast.success("Assessment created!", {
-              position: "top-right",
-              autoClose: 5000,
-              hideProgressBar: false,
-              closeOnClick: true,
-              pauseOnHover: true,
-              draggable: true,
-              progress: undefined,
-            });
-          })
-          .catch((ex) => {
-            const errorMessage =
-              ex.response !== undefined
-                ? ex.response.data.message
-                : "Backend is down!";
-            toast.error("Courses page could not be loaded! " + errorMessage, {
-              position: "top-right",
-              autoClose: 5000,
-              hideProgressBar: false,
-              closeOnClick: true,
-              pauseOnHover: true,
-              draggable: true,
-              progress: undefined,
-            });
-
-            if (
-              ex.response !== undefined &&
-              ex.response.data.message.includes("expire")
-            ) {
-              setTimeout(function () {
-                localStorage.clear();
-                window.location.href = "/login";
-              }, 2500);
-            }
-          });
       }
     }
+
+    await CourseService.addAssessment(
+      localStorage.getItem("token"),
+      this.state.courseId,
+      questions
+    )
+      .then(() => {
+        this.setState({
+          showCreateAssessmentModal: false,
+        });
+        toast.success("Assessment created!", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+      })
+      .catch((ex) => {
+        const errorMessage =
+          ex.response !== undefined
+            ? ex.response.data.message
+            : "Backend is down!";
+        toast.error("Courses page could not be loaded! " + errorMessage, {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+
+        if (
+          ex.response !== undefined &&
+          ex.response.data.message.includes("expire")
+        ) {
+          setTimeout(function () {
+            localStorage.clear();
+            window.location.href = "/login";
+          }, 2500);
+        }
+      });
+  }
+
+  async handleSubmitAssessment(event) {
+    event.preventDefault();
+    let resultQuestions = [];
+    for (let i = 0; i <= this.state.numberOfQuestions - 1; i++) {
+      resultQuestions.push(
+        this.state.questions[i] + "##" + this.state.questionsTexts[i]
+      );
+    }
+    console.log(resultQuestions);
+
+    await CourseService.submitAssessment(
+      localStorage.getItem("token"),
+      this.state.courseId,
+      resultQuestions,
+      localStorage.getItem("user")
+    )
+      .then(() => {
+        this.setState({
+          showTakeAssessmentModal: false,
+        });
+        toast.success("Assessment submitted!", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+      })
+      .catch((ex) => {
+        const errorMessage =
+          ex.response !== undefined
+            ? ex.response.data.message
+            : "Backend is down!";
+        toast.error("Courses page could not be loaded! " + errorMessage, {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+
+        if (
+          ex.response !== undefined &&
+          ex.response.data.message.includes("expire")
+        ) {
+          setTimeout(function () {
+            localStorage.clear();
+            window.location.href = "/login";
+          }, 2500);
+        }
+      });
   }
 
   render() {
@@ -536,8 +648,11 @@ class CoursePage extends React.Component {
         </button>
         <button
           type="button"
+          style={{
+            display: "none",
+          }}
           id="create-assessment"
-          onClick={() => this.setState({ showModal: true })}
+          onClick={() => this.setState({ showCreateAssessmentModal: true })}
         >
           Create Assessment
         </button>
@@ -547,12 +662,12 @@ class CoursePage extends React.Component {
           onRequestClose={() =>
             this.setState({ showCreateAssessmentModal: false })
           }
-          contentLabel="ADD COURSE"
+          contentLabel="ADD ASSESSMENT"
           className="add-course"
           overlayClassName="myoverlay"
           closeTimeoutMS={500}
         >
-          <h2 id="header-form">Add Course</h2>
+          <h2 id="header-form">Add Assessment</h2>
           <form id="form-add-course">
             <div className="form-inner" id="form-body">
               {this.state.modalQuestions.map((elem, key) => (
@@ -587,7 +702,6 @@ class CoursePage extends React.Component {
                   />
                 </div>
               ))}
-              {this.state.test}
               <input
                 id="add-question"
                 type="submit"
@@ -600,6 +714,59 @@ class CoursePage extends React.Component {
                 type="submit"
                 onClick={this.handleSubmitCreateAssessment.bind(this)}
                 value="ADD ASSESSMENT"
+              />
+            </div>
+          </form>
+        </Modal>
+
+        <Modal
+          isOpen={this.state.showTakeAssessmentModal}
+          onRequestClose={() =>
+            this.setState({ showTakeAssessmentModal: false })
+          }
+          contentLabel="TAKE ASSESSMENT"
+          className="add-course"
+          overlayClassName="myoverlay"
+          closeTimeoutMS={500}
+        >
+          <h2 id="header-form">Take Assessment</h2>
+          <form id="form-add-course">
+            <div className="form-inner" id="form-body">
+              {this.state.questions.map((elem) => (
+                <div className="form-group">
+                  <label htmlFor="course-description">
+                    {<a style={{ color: "red" }}>{elem.split("##")[0]}:</a>}{" "}
+                    {elem.split("##")[1]}
+                  </label>
+                  <input
+                    type="text"
+                    id={"question-" + elem.split("##")[0].split(" ")[1]}
+                    name="course-description"
+                    onChange={(e) => {
+                      this.setState(
+                        update(this.state, {
+                          questionsTexts: {
+                            [elem.split("##")[0].split(" ")[1] - 1]: {
+                              $set: e.target.value,
+                            },
+                          },
+                        })
+                      );
+                    }}
+                    value={
+                      this.state.questionsTexts[
+                        elem.split("##")[0].split(" ")[1] - 1
+                      ]
+                    }
+                  />
+                </div>
+              ))}
+              <input
+                id="submit-assessment"
+                type="submit"
+                style={{ marginLeft: "20%" }}
+                onClick={this.handleSubmitAssessment.bind(this)}
+                value="SUBMIT ASSESSMENT"
               />
             </div>
           </form>
