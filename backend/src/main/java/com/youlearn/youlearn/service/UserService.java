@@ -1,9 +1,14 @@
 package com.youlearn.youlearn.service;
 
 import com.youlearn.youlearn.exception.BadRequestException;
+import com.youlearn.youlearn.model.Course;
+import com.youlearn.youlearn.model.CourseEnrollment;
 import com.youlearn.youlearn.model.Token;
 import com.youlearn.youlearn.model.User;
 import com.youlearn.youlearn.model.UserRole;
+import com.youlearn.youlearn.model.dto.CertificationDto;
+import com.youlearn.youlearn.repository.CourseEnrollmentRepository;
+import com.youlearn.youlearn.repository.CourseRepository;
 import com.youlearn.youlearn.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.apache.logging.log4j.LogManager;
@@ -14,7 +19,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 import static com.youlearn.youlearn.utils.Constants.USER_NOT_FOUND_MSG;
 
@@ -25,6 +34,9 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final TokenService tokenService;
+    private final CourseRepository courseRepository;
+    
+    private final CourseEnrollmentRepository courseEnrollmentRepository;
 
     private final Logger logger = LogManager.getLogger(UserService.class);
 
@@ -83,13 +95,45 @@ public class UserService implements UserDetailsService {
     }
 
     public UserRole getUserRoleForUser(String email) {
+        return checkIfEmailExists(email).getRole();
+    }
+    
+    private User checkIfEmailExists(String email) {
         Optional<User> userOptional = userRepository.findByEmail(email);
 
         if (userOptional.isPresent()) {
-            return userOptional.get().getRole();
+            return userOptional.get();
         }
         else {
             throw new BadRequestException("User not present in database.");
         }
+    }
+
+    public List<CertificationDto> getCertificationsForUser(String email) {
+        User user = checkIfEmailExists(email);
+        List<CourseEnrollment> completedCoursesForUserId = courseEnrollmentRepository.findCompletedCoursesForUserId(user.getId());
+
+        if (completedCoursesForUserId.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<CertificationDto> certificationDtos = new ArrayList<>();
+        for (var completedCourseForUserId: completedCoursesForUserId) {
+            Optional<Course> optionalCourse = courseRepository.findById(completedCourseForUserId.getCourse().getId());
+            if (optionalCourse.isEmpty()) {
+                throw new BadRequestException(String.format("There is no course with id %s", completedCourseForUserId.getCourse().getId()));
+            }
+
+            Course course = optionalCourse.get();
+
+            CertificationDto certificationDto = new CertificationDto();
+            certificationDto.setCourseName(course.getCourseName());
+            certificationDto.setRegisteredAt(completedCourseForUserId.getRegisteredAt());
+            certificationDto.setCompletedAt(completedCourseForUserId.getCompletedAt());
+            certificationDto.setInstructorName(user.getFirstName() + " " + user.getLastName());
+
+            certificationDtos.add(certificationDto);
+        }
+
+        return certificationDtos;
     }
 }

@@ -1,10 +1,20 @@
 package com.youlearn.youlearn.controller;
 
 import com.youlearn.youlearn.model.dto.AssessmentDto;
+import com.youlearn.youlearn.model.dto.SubmissionDto;
 import com.youlearn.youlearn.service.AssessmentService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.ModelAndView;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/assessment")
@@ -28,7 +38,20 @@ public class AssessmentController {
     }
 
     @GetMapping("/questions")
-    public ResponseEntity<?> retrieveAssessment() {
-        return new ResponseEntity<>(HttpStatus.OK);
+    public ResponseEntity<List<String>> retrieveQuestions(@RequestParam("courseId") String courseId) {
+        return new ResponseEntity<>(assessmentService.retrieveQuestions(courseId), HttpStatus.OK);
     }
+
+    @PostMapping("/submit")
+    @ResponseStatus(HttpStatus.OK)
+    public void submitAssessment(@RequestBody SubmissionDto submissionDto) {
+        assessmentService.submitAssessment(submissionDto);
+    }
+
+    @GetMapping("/result")
+    @ResponseStatus(HttpStatus.OK)
+    public ModelAndView gradeAssessment(@RequestParam("status") Boolean status, @RequestParam("userId") Long userId, @RequestParam("courseId") Long courseId) {
+        return assessmentService.gradeAssessment(status, userId, courseId);
+    }
+
 }

@@ -103,4 +103,11 @@ public class CourseController {
     public ResponseEntity<Boolean> isCertificationObtained(@RequestParam("courseId") String courseId, @RequestBody String email) {
         return new ResponseEntity<>(courseService.checkIfCertificationIsObtained(courseId, email), HttpStatus.OK);
     }
+
+    @PostMapping
+    @RequestMapping("/assessment")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<Boolean> isAssessmentTaken(@RequestParam("courseId") String courseId, @RequestBody String email) {
+        return new ResponseEntity<>(courseService.checkIfAssessmentIsTaken(courseId, email), HttpStatus.OK);
+    }
 }

@@ -51,7 +51,7 @@ public class RegistrationService {
         String link = String.format("http://localhost:%s/api/v1/register/confirm?token=%s", port, tokenString);
 
         try {
-            emailService.send(request.getEmail(), buildEmail(request.getFirstName(), link));
+            emailService.send(request.getEmail(), buildEmail(request.getFirstName(), link), "Confirm Email");
         }
         catch (Exception ex) {
             userService.deleteUser(user);

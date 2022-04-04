@@ -1,7 +1,6 @@
 package com.youlearn.youlearn.service;
 
 import com.youlearn.youlearn.exception.BadRequestException;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -19,7 +18,7 @@ import java.util.function.Predicate;
 @RequiredArgsConstructor
 public class EmailService implements Predicate<String> {
 
-    private final static Logger LOGGER = LogManager.getLogger(EmailService.class);
+    private static final Logger LOGGER = LogManager.getLogger(EmailService.class);
     private final JavaMailSender javaMailSender;
 
     @Value("${spring.mail.username}")
@@ -31,13 +30,13 @@ public class EmailService implements Predicate<String> {
     }
 
     @Async
-    public void send(String to, String email) {
+    public void send(String to, String email, String subject) {
         try {
             MimeMessage mimeMessage = javaMailSender.createMimeMessage();
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, "utf-8");
             mimeMessageHelper.setText(email, true);
             mimeMessageHelper.setTo(to);
-            mimeMessageHelper.setSubject("Confirm Email");
+            mimeMessageHelper.setSubject(subject);
             mimeMessageHelper.setFrom(from);
             javaMailSender.send(mimeMessage);
         }

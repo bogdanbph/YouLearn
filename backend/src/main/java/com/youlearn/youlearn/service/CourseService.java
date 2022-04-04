@@ -48,6 +48,11 @@ public class CourseService {
             throw new NotFoundException("Instructor not present in database!");
         }
 
+        Optional<Course> optionalCourse = courseRepository.findByCourseYoutubeId(courseDto.getCourseYoutubeId());
+        if (optionalCourse.isPresent()) {
+            throw new BadRequestException("This course is already present in database.");
+        }
+
         Course course = new Course();
         course.setEmailInstructor(courseDto.getEmailInstructor());
         course.setCourseYoutubeId(courseDto.getCourseYoutubeId());
@@ -65,7 +70,7 @@ public class CourseService {
 
 
         Optional<CourseEnrollment> byUserAndCourse = courseEnrollmentRepository.findByUserAndCourse(course.getId(), user.getId());
-        return byUserAndCourse.isPresent();
+        return byUserAndCourse.isPresent() || user.getEmail().equals(course.getEmailInstructor());
     }
 
     public void enrollUser(String email, Long courseId) {
@@ -173,20 +178,41 @@ public class CourseService {
     }
 
     public Boolean checkIfCertificationIsObtained(String courseId, String email) {
-        try (JsonReader jsonReader = Json.createReader(new StringReader(email))) {
-            JsonObject object = jsonReader.readObject();
-            JsonValue jsonEmail = object.get("email");
-            String emailValue = jsonEmail.toString().replace("\"", "");
+        String emailValue = deserializeJson(email);
 
-            User user = checkUserPresent(emailValue);
-            Course course = checkIfCoursePresentByUrl(courseId);
+        User user = checkUserPresent(emailValue);
+        Course course = checkIfCoursePresentByUrl(courseId);
 
-            Optional<CourseEnrollment> optionalCourseEnrollment = courseEnrollmentRepository.findByUserAndCourse(course.getId(), user.getId());
-            if (optionalCourseEnrollment.isEmpty()) {
-                throw new BadRequestException(String.format("User %s is not enrolled in course %s.", user.getEmail(), course.getCourseName()));
-            }
+        Optional<CourseEnrollment> optionalCourseEnrollment = courseEnrollmentRepository.findByUserAndCourse(course.getId(), user.getId());
+        if (!user.getEmail().equals(course.getEmailInstructor()) && optionalCourseEnrollment.isEmpty()) {
+            throw new BadRequestException(String.format("User %s is not enrolled in course %s.", user.getEmail(), course.getCourseName()));
+        }
+        if (optionalCourseEnrollment.isPresent()) {
             CourseEnrollment courseEnrollment = optionalCourseEnrollment.get();
             return courseEnrollment.isCertificationObtained();
+        }
+        return user.getEmail().equals(course.getEmailInstructor());
+    }
+
+    public Boolean checkIfAssessmentIsTaken(String courseId, String email) {
+        String emailValue = deserializeJson(email);
+
+        User user = checkUserPresent(emailValue);
+        Course course = checkIfCoursePresentByUrl(courseId);
+
+        Optional<CourseEnrollment> optionalCourseEnrollment = courseEnrollmentRepository.findByUserAndCourse(course.getId(), user.getId());
+        if (optionalCourseEnrollment.isEmpty()) {
+            throw new BadRequestException(String.format("User %s is not enrolled in course %s.", user.getEmail(), course.getCourseName()));
+        }
+        CourseEnrollment courseEnrollment = optionalCourseEnrollment.get();
+        return courseEnrollment.isAssessmentTaken();
+    }
+
+    private String deserializeJson(String json) {
+        try (JsonReader jsonReader = Json.createReader(new StringReader(json))) {
+            JsonObject object = jsonReader.readObject();
+            JsonValue jsonEmail = object.get("email");
+            return jsonEmail.toString().replace("\"", "");
         }
     }
 }
