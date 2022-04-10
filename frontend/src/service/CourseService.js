@@ -207,6 +207,26 @@ class CourseService {
       }
     );
   }
+
+  setCourseAvailability(isAvailable, token, courseId) {
+    return axios.post(
+      COURSE_API_URL + "/availability?courseId=" + courseId + "&isAvailable=" + isAvailable,
+      {},
+      {
+        headers: {
+          Authorization: "Bearer " + token,
+        },
+      }
+    );
+  }
+  
+  getCourseAvailability(token, courseId) {
+    return axios.get(COURSE_API_URL + "/availability?courseId=" + courseId, {
+      headers: {
+        Authorization: "Bearer " + token,
+      },
+    });
+  }
 }
 
 export default new CourseService();

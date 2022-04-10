@@ -36,6 +36,7 @@ class CoursePage extends React.Component {
       questions: [""],
       questionsTexts: ["", "", "", "", ""],
       isAssessmentTaken: false,
+      isCourseVisible: false
     };
   }
 
@@ -54,64 +55,13 @@ class CoursePage extends React.Component {
 
     await this.checkValidPlaylist(playlistId);
     if (this.state.isCourseValid === true) {
-      await this.renderData(playlistId, playlistName, chapters);
-
-      // await CourseService.isAssessmentTaken(
-      //   localStorage.getItem("user"),
-      //   localStorage.getItem("token"),
-      //   playlistId
-      // )
-      //   .then((res) => {
-      //     this.setState({
-      //       isAssessmentTaken: res.data,
-      //     });
-      //   })
-      //   .catch();
-
-      await CourseService.checkIfCertificationIsObtained(
-        localStorage.getItem("user"),
-        localStorage.getItem("token"),
-        playlistId
-      ).then((res) => {
+      await CourseService.getCourseAvailability(localStorage.getItem("token"), playlistId)
+      .then((res) => {
         this.setState({
-          isCertificationObtained: res.data,
-        });
-
-        if (
-          this.state.isCertificationObtained === true ||
-          this.state.isAssessmentTaken === true
-        ) {
-          document.getElementById("take-assessment").style.display = "none";
-        }
-      });
-
-      await this.state.body.props.children[1].props.children.forEach(
-        async (element) => {
-          await CourseService.checkCompletedChapters(
-            localStorage.getItem("user"),
-            localStorage.getItem("token"),
-            element.key,
-            playlistId
-          ).then((res) => {
-            if (res.data === false) {
-              document.getElementById("complete" + element.key).textContent =
-                "Mark as Complete";
-            } else {
-              document.getElementById("complete" + element.key).textContent =
-                "Mark as Incomplete";
-              this.state.numberOfCompletedChapters++;
-              if (
-                this.state.numberOfChapters ==
-                  this.state.numberOfCompletedChapters &&
-                this.state.isCertificationObtained === false
-              ) {
-                document.getElementById("take-assessment").style.display =
-                  "block";
-              }
-            }
-          });
-        }
-      );
+          isCourseVisible: res.data
+        })
+      })
+      .catch(ex => {})
 
       await CourseService.retrieveInstructorEmail(
         localStorage.getItem("token"),
@@ -124,35 +74,22 @@ class CoursePage extends React.Component {
         })
         .catch((ex) => {});
 
-      await CourseService.checkIfAssessmentExistsForCourse(
-        localStorage.getItem("token"),
-        playlistId
-      )
-        .then((res) => {
-          if (res.data.questions.length > 0) {
-            this.setState({
-              existsAssessment: true,
-            });
-          }
+      if (this.state.isCourseVisible === true || this.state.instrutorEmail === localStorage.getItem('user')) {
+        await this.renderData(playlistId, playlistName, chapters);
 
-          console.log(this.state);
-        })
-        .catch((ex) => {});
-
-      console.log(this.state);
-      if (this.state.existsAssessment === true) {
         await CourseService.isAssessmentTaken(
           localStorage.getItem("token"),
           localStorage.getItem("user"),
           playlistId
         )
           .then((res) => {
+            console.log(res);
             this.setState({
               isAssessmentTaken: res.data,
             });
           })
           .catch((ex) => {});
-
+  
         if (this.state.isAssessmentTaken === false) {
           await CourseService.retrieveQuestions(
             localStorage.getItem("token"),
@@ -166,16 +103,97 @@ class CoursePage extends React.Component {
             })
             .catch((ex) => {});
         }
-      }
+  
+        await CourseService.checkIfCertificationIsObtained(
+          localStorage.getItem("user"),
+          localStorage.getItem("token"),
+          playlistId
+        ).then((res) => {
+          this.setState({
+            isCertificationObtained: res.data,
+          });
+  
+          if (
+            this.state.isCertificationObtained === true ||
+            this.state.isAssessmentTaken === true
+          ) {
+            console.log('here');
+            document.getElementById("take-assessment").style.display = "none";
+          }
+        });
+        await this.state.body?.props?.children[2]?.props?.children?.forEach(
+          async (element) => {
+            await CourseService.checkCompletedChapters(
+              localStorage.getItem("user"),
+              localStorage.getItem("token"),
+              element.key,
+              playlistId
+            ).then((res) => {
+              if (res.data === false) {
+                document.getElementById("complete" + element.key).textContent =
+                  "Mark as Complete";
+              } else {
+                document.getElementById("complete" + element.key).textContent =
+                  "Mark as Incomplete";
+                this.state.numberOfCompletedChapters++;
+                if (
+                  this.state.numberOfChapters ==
+                    this.state.numberOfCompletedChapters &&
+                  this.state.isCertificationObtained === false
+                  && this.state.isAssessmentTaken === false
+                ) {
+                  document.getElementById("take-assessment").style.display =
+                    "block";
+                }
+              }
+            });
+          }
+        );
+  
+        await CourseService.checkIfAssessmentExistsForCourse(
+          localStorage.getItem("token"),
+          playlistId
+        )
+          .then((res) => {
+            if (res.data.questions.length > 0) {
+              this.setState({
+                existsAssessment: true,
+              });
+            }
+  
+            console.log(this.state);
+          })
+          .catch((ex) => {});
+  
+        if (
+          this.state.existsAssessment === false &&
+          this.state.instrutorEmail === localStorage.getItem("user")
+        ) {
+          document.getElementById("create-assessment").style.display = "block";
+        } else {
+          document.getElementById("create-assessment").style.display = "none";
+        }
 
-      if (
-        this.state.existsAssessment === false &&
-        this.state.instrutorEmail === localStorage.getItem("user")
-      ) {
-        document.getElementById("create-assessment").style.display = "block";
-      } else {
-        console.log(document.getElementById("create-assessment"));
-        document.getElementById("create-assessment").style.display = "none";
+        if (this.state.instrutorEmail === localStorage.getItem("user")) {
+          document.getElementById("set-availability").style.display = "block";
+        }
+        else {
+          document.getElementById("set-availability").style.display = "none";
+        }
+      }
+      else {
+        toast.error("Course with id: " + playlistId + " is not available anymore.", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+        setTimeout(function () {
+          window.location.href = "/courses";
+        }, 2500);
       }
     } else {
       toast.error("Course unavailable with id: " + playlistId, {
@@ -241,9 +259,19 @@ class CoursePage extends React.Component {
         body: (
           <main className="course-container">
             <h1 className="course-title" style={{ marginLeft: "10%" }}>
-              {playlistName}
+              {playlistName} 
             </h1>
-
+            <button
+            type="button"
+            style={{
+              display: "none",
+            }}
+            className=""
+            id="set-availability"
+            onClick={() => this.handleSetCourseAvailability(playlistId)}
+          >
+            {this.state.isCourseVisible ? "Make Unavailable" : "Make Available"}
+          </button>
             <ul className="chapters">
               {data?.items?.map((item) => {
                 const { id, snippet = {} } = item;
@@ -317,6 +345,33 @@ class CoursePage extends React.Component {
       });
     });
   };
+
+  async handleSetCourseAvailability(courseId) {
+    await CourseService.setCourseAvailability(this.state.isCourseVisible, localStorage.getItem('token'), courseId)
+    .then(() => {
+      console.log(this.state.isCourseVisible);
+      let message = this.state.isCourseVisible ? "Course is now unavailble" : "Course is now available";
+      toast.success(
+        message,
+        {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        }
+      );
+      this.setState({
+        isCourseVisible: !this.state.isCourseVisible
+      })
+      setTimeout(function () {
+        window.location.reload(false);
+      }, 2500);
+    })
+    .catch();
+  }
 
   async handleCompleteChapter(chapterUrl, courseYoutubeId) {
     if (
@@ -544,6 +599,9 @@ class CoursePage extends React.Component {
           draggable: true,
           progress: undefined,
         });
+        setTimeout(function() {
+          window.location.reload(false);
+        }, 2500);
       })
       .catch((ex) => {
         const errorMessage =
@@ -592,6 +650,7 @@ class CoursePage extends React.Component {
         this.setState({
           showTakeAssessmentModal: false,
         });
+        console.log(this.state);
         toast.success("Assessment submitted!", {
           position: "top-right",
           autoClose: 5000,
@@ -601,6 +660,9 @@ class CoursePage extends React.Component {
           draggable: true,
           progress: undefined,
         });
+        setTimeout(function() {
+          window.location.reload(false);
+        }, 2500)
       })
       .catch((ex) => {
         const errorMessage =

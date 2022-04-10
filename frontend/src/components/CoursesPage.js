@@ -24,6 +24,7 @@ class CoursesPage extends React.Component {
         description: "",
       },
       availability: new Map(),
+      visibleCourses: 0
     };
 
     this.handleEnroll = this.handleEnroll.bind(this);
@@ -82,9 +83,13 @@ class CoursesPage extends React.Component {
                   urlParams.searchParams.get("v") +
                   "/1.jpg";
                 await this.checkEnrolled(course.id);
-
+                if (course.isVisible || course.emailInstructor === localStorage.getItem("user")) {
+                  this.setState({
+                    visibleCourses: this.state.visibleCourses + 1
+                  })
+                }
                 return (
-                  <div key={course.id} className="grid-item">
+                  <div key={course.id} style={{display: course.isVisible || course.emailInstructor === localStorage.getItem("user") ? "block" : "none"}}className="grid-item">
                     <div
                       className="card"
                       style={{ width: "18rem", height: "auto" }}
@@ -472,7 +477,7 @@ class CoursesPage extends React.Component {
           </form>
         </Modal>
         <div className="common-body" id="common-body-courses">
-          <div className="grid-container">{this.state.courses}</div>
+          <div className="grid-container">{this.state.visibleCourses === 0 ? <p style={{marginTop: "25px"}}>No courses available.</p> : this.state.courses }</div>
         </div>
       </div>
     );
