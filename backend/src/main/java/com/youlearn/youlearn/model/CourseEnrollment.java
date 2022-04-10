@@ -39,5 +39,6 @@ public class CourseEnrollment {
     LocalDateTime completedAt;
     boolean isCertificationObtained;
     boolean isAssessmentTaken;
+    boolean isGradeSubmmited;
 
 }

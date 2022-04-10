@@ -25,6 +25,6 @@ public interface CourseEnrollmentRepository extends JpaRepository<CourseEnrollme
     void takeAssessment(Long userId, Long courseId);
 
     @Modifying
-    @Query("update CourseEnrollment ce set ce.isCertificationObtained = ?1, ce.completedAt = current_timestamp where ce.user.id = ?2 and ce.course.id = ?3")
+    @Query("update CourseEnrollment ce set ce.isCertificationObtained = ?1, ce.completedAt = current_timestamp, ce.isGradeSubmmited = true where ce.user.id = ?2 and ce.course.id = ?3")
     void gradeAssessment(Boolean status, Long userId, Long courseId);
 }

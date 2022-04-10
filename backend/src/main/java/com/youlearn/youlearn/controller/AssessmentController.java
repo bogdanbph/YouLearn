@@ -5,15 +5,11 @@ import com.youlearn.youlearn.model.dto.SubmissionDto;
 import com.youlearn.youlearn.service.AssessmentService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.view.RedirectView;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -50,8 +46,11 @@ public class AssessmentController {
 
     @GetMapping("/result")
     @ResponseStatus(HttpStatus.OK)
-    public ModelAndView gradeAssessment(@RequestParam("status") Boolean status, @RequestParam("userId") Long userId, @RequestParam("courseId") Long courseId) {
-        return assessmentService.gradeAssessment(status, userId, courseId);
+    @RequestMapping(value = "/result", method = RequestMethod.GET)
+    public RedirectView gradeAssessment(@RequestParam("status") Boolean status, @RequestParam("userId") Long userId, @RequestParam("courseId") Long courseId) {
+        RedirectView redirectView = new RedirectView();
+        redirectView.setUrl(assessmentService.gradeAssessment(status, userId, courseId));
+        return redirectView;
     }
 
 }

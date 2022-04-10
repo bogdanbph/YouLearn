@@ -36,4 +36,5 @@ public class Course {
     private String courseYoutubeId;
     private Float price;
     private String description;
+    private Boolean isVisible;
 }

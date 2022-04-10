@@ -2,6 +2,7 @@ package com.youlearn.youlearn.service;
 
 import com.youlearn.youlearn.exception.BadRequestException;
 import com.youlearn.youlearn.model.Course;
+import com.youlearn.youlearn.model.CourseEnrollment;
 import com.youlearn.youlearn.model.Question;
 import com.youlearn.youlearn.model.User;
 import com.youlearn.youlearn.model.dto.AssessmentDto;
@@ -118,15 +119,15 @@ public class AssessmentService {
                 String questionText = question.split("##")[1] + "<br/>";
                 String answer = question.split("##")[2];
 
-                return "<li><b" + questionNo + questionText + answer + "</li>";
+                return "<li><b>" + questionNo + "</b>" + questionText + answer + "</li>";
             }).collect(Collectors.toList());
             StringBuilder questionsString = new StringBuilder();
             for (String questionMapped: questionsMapped) {
                 questionsString.append(questionMapped);
             }
             courseEnrollmentRepository.takeAssessment(user.getId(), course.getId());
-            final String linkApprove = "http://localhost:8080/assessment/result?status=true&userId=" + user.getId() + "&courseId=" + course.getId();
-            final String linkDeny = "http://localhost:8080/assessment/result?status=false&userId=" + user.getId() + "&courseId=" + course.getId();
+            final String linkApprove = "http://localhost:8080/api/v1/assessment/result?status=true&userId=" + user.getId() + "&courseId=" + course.getId();
+            final String linkDeny = "http://localhost:8080/api/v1/assessment/result?status=false&userId=" + user.getId() + "&courseId=" + course.getId();
             String email = buildEmailInstructor(user.getEmail(),
                     instructor.getFirstName() + " " + instructor.getLastName(),
                     linkApprove,
@@ -292,7 +293,17 @@ public class AssessmentService {
     }
 
     @Transactional
-    public ModelAndView gradeAssessment(Boolean status, Long userId, Long courseId) {
+    public String gradeAssessment(Boolean status, Long userId, Long courseId) {
+        Optional<CourseEnrollment> optionalCourseEnrollment = courseEnrollmentRepository.findByUserAndCourse(courseId, userId);
+        if (optionalCourseEnrollment.isEmpty()) {
+            throw new BadRequestException("The user is not enrolled in this course");
+        }
+
+        CourseEnrollment courseEnrollment = optionalCourseEnrollment.get();
+        if (courseEnrollment.isGradeSubmmited() == true) {
+            throw new BadRequestException("This assessment has been already submitted.");
+        }
+
         courseEnrollmentRepository.gradeAssessment(status, userId, courseId);
         String grade = "";
         if (Boolean.TRUE.equals(status)) {
@@ -316,8 +327,6 @@ public class AssessmentService {
 
         String emailBody = buildEmailUser(user.getFirstName() + " " + user.getLastName(), grade, course.getCourseName());
         emailService.send(user.getEmail(), emailBody, "Grade received for " + course.getCourseName());
-        ModelMap modelMap = new ModelMap();
-        modelMap.addAttribute("grade", true);
-        return new ModelAndView("redirect:" + "http://localhost:3000/grade", modelMap);
+        return "http://localhost:3000/";
     }
 }

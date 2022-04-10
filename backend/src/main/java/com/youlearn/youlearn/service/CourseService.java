@@ -60,6 +60,7 @@ public class CourseService {
         course.setPrice(courseDto.getPrice());
         course.setDescription(courseDto.getDescription());
         course.setNumberOfChapters(courseDto.getNumberOfChapters());
+        course.setIsVisible(false);
 
         courseRepository.save(course);
     }
@@ -201,11 +202,15 @@ public class CourseService {
         Course course = checkIfCoursePresentByUrl(courseId);
 
         Optional<CourseEnrollment> optionalCourseEnrollment = courseEnrollmentRepository.findByUserAndCourse(course.getId(), user.getId());
-        if (optionalCourseEnrollment.isEmpty()) {
+        if (optionalCourseEnrollment.isEmpty() && !user.getEmail().equals(course.getEmailInstructor())) {
             throw new BadRequestException(String.format("User %s is not enrolled in course %s.", user.getEmail(), course.getCourseName()));
         }
-        CourseEnrollment courseEnrollment = optionalCourseEnrollment.get();
-        return courseEnrollment.isAssessmentTaken();
+
+        if (optionalCourseEnrollment.isPresent()) {
+            CourseEnrollment courseEnrollment = optionalCourseEnrollment.get();
+            return courseEnrollment.isAssessmentTaken();
+        }
+        return user.getEmail().equals(course.getEmailInstructor());
     }
 
     private String deserializeJson(String json) {
@@ -214,5 +219,15 @@ public class CourseService {
             JsonValue jsonEmail = object.get("email");
             return jsonEmail.toString().replace("\"", "");
         }
+    }
+
+    @Transactional
+    public void setCourseAvailability(String courseId, Boolean isAvailable) {
+        Course course = checkIfCoursePresentByUrl(courseId);
+        courseRepository.setCourseAvailability(course.getId(), !isAvailable);
+    }
+
+    public Boolean getCourseAvailability(String courseId) {
+        return courseRepository.findByCourseYoutubeId(courseId).orElseThrow().getIsVisible();
     }
 }
