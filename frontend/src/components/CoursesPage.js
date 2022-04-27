@@ -81,7 +81,7 @@ class CoursesPage extends React.Component {
                 let thumbnailLink =
                   "https://img.youtube.com/vi/" +
                   urlParams.searchParams.get("v") +
-                  "/1.jpg";
+                  "/hqdefault.jpg";
                 await this.checkEnrolled(course.id);
                 if (course.isVisible || course.emailInstructor === localStorage.getItem("user")) {
                   this.setState({

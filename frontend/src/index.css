@@ -36,4 +36,5 @@ h2 span {
   height: 100vh;
   padding-top: 10vh;
   justify-content: center;
+  position: relative;
 }
