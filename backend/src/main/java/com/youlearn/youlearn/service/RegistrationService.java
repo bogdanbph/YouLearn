@@ -29,7 +29,7 @@ public class RegistrationService {
 
     public String registerUser(RegistrationRequest request) {
         boolean isValid = emailService.test(request.getEmail());
-        boolean isValidPassword = request.getPassword().matches("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$");
+        boolean isValidPassword = request.getPassword().matches("^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,}$");
 
         if (!isValid) {
             throw new BadRequestException("Email format is not correct.");
@@ -61,7 +61,7 @@ public class RegistrationService {
     }
 
     @Transactional
-    public String confirmToken(String tokenString) {
+    public void confirmToken(String tokenString) {
         Token token = tokenService.getToken(tokenString)
                 .orElseThrow(() -> new BadRequestException("Token not found in database."));
         if (token.getConfirmedAt() != null) {
@@ -76,7 +76,6 @@ public class RegistrationService {
         tokenService.setConfrimedAt(tokenString);
         userService.enableUser(token.getUser().getEmail());
 
-        return "confirmed";
     }
 
     private String buildEmail(String name, String link) {

@@ -25,21 +25,23 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 public class AuthorizationFilter extends OncePerRequestFilter {
 
     private static final String SECRET = "%$^VVREerow98543#@F#9vi90da-$##^#%$^VVREerow98543#@F#9vi90da-$##^#%$^VVREerow98543#@F#9vi90da-$##^#%$^VVREerow98543#@F#9vi90da-$##^#%$^VVREerow98543#@F#9vi90da-$##^#";
+    private static final String TOKEN_PREFIX = "Bearer ";
+    private static final String ROLE = "role";
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String authorizationHeader = request.getHeader(AUTHORIZATION);
 
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+        if (authorizationHeader != null && authorizationHeader.startsWith(TOKEN_PREFIX)) {
             try {
-                String token = authorizationHeader.substring("Bearer ".length());
+                String token = authorizationHeader.substring(TOKEN_PREFIX.length());
                 Algorithm algorithm = Algorithm.HMAC256(SECRET.getBytes(StandardCharsets.UTF_8));
                 JWTVerifier jwtVerifier = JWT.require(algorithm).build();
 
                 DecodedJWT decodedJWT = jwtVerifier.verify(token);
 
                 String username = decodedJWT.getSubject();
-                String[] roles = decodedJWT.getClaim("role").asArray(String.class);
+                String[] roles = decodedJWT.getClaim(ROLE).asArray(String.class);
 
                 Collection<SimpleGrantedAuthority> authorityCollection = new ArrayList<>();
                 Arrays.stream(roles).forEach(role -> authorityCollection.add(new SimpleGrantedAuthority(role)));

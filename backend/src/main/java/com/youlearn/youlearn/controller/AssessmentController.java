@@ -5,6 +5,7 @@ import com.youlearn.youlearn.model.dto.SubmissionDto;
 import com.youlearn.youlearn.service.AssessmentService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
@@ -44,13 +45,11 @@ public class AssessmentController {
         assessmentService.submitAssessment(submissionDto);
     }
 
-    @GetMapping("/result")
-    @ResponseStatus(HttpStatus.OK)
-    @RequestMapping(value = "/result", method = RequestMethod.GET)
-    public RedirectView gradeAssessment(@RequestParam("status") Boolean status, @RequestParam("userId") Long userId, @RequestParam("courseId") Long courseId) {
-        RedirectView redirectView = new RedirectView();
-        redirectView.setUrl(assessmentService.gradeAssessment(status, userId, courseId));
-        return redirectView;
+    @RequestMapping(path = "/result", method = RequestMethod.GET)
+    public ModelAndView gradeAssessment(@RequestParam("status") Boolean status, @RequestParam("userId") Long userId, @RequestParam("courseId") Long courseId) {
+        assessmentService.gradeAssessment(status, userId, courseId);
+        ModelMap modelMap = new ModelMap();
+        return new ModelAndView("redirect:" + "http://localhost:3000", modelMap);
     }
 
 }
