@@ -3,6 +3,8 @@ package com.youlearn.youlearn.model;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -30,6 +32,7 @@ public class Question {
     private Long id;
 
     @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "course_id")
     private Course courseId;
 

@@ -7,7 +7,17 @@ import com.youlearn.youlearn.model.dto.CourseUserDto;
 import com.youlearn.youlearn.service.CourseService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -24,6 +34,11 @@ public class CourseController {
     @GetMapping
     public ResponseEntity<List<Course>> getCourses() {
         return new ResponseEntity<>(courseService.getCourses(), HttpStatus.OK);
+    }
+
+    @GetMapping("/single")
+    public ResponseEntity<Course> getCourseByCourseId(@RequestParam("courseId") String courseId) {
+        return new ResponseEntity<>(courseService.getCourseByCourseId(courseId), HttpStatus.OK);
     }
 
     @PostMapping
@@ -116,13 +131,13 @@ public class CourseController {
     }
 
     @PutMapping
-    @RequestMapping
+    @RequestMapping("/edit")
     public void updateCourse(@RequestParam("courseId") String courseId, @RequestBody CourseDto courseDto) {
         courseService.updateCourse(courseId, courseDto);
     }
 
     @DeleteMapping
-    @RequestMapping
+    @RequestMapping("/delete")
     public void deleteCourse(@RequestParam("courseId") String courseId) {
         courseService.deleteCourse(courseId);
     }

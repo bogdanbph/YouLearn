@@ -18,10 +18,15 @@ import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
 import javax.json.JsonValue;
+import javax.sql.DataSource;
 import javax.transaction.Transactional;
 import java.io.StringReader;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -31,12 +36,14 @@ public class CourseService {
     private final UserRepository userRepository;
     private final CourseEnrollmentRepository courseEnrollmentRepository;
     private final ChapterEnrollmentRepository chapterEnrollmentRepository;
+    private final DataSource dataSource;
 
-    public CourseService(CourseRepository courseRepository, UserRepository userRepository, CourseEnrollmentRepository courseEnrollmentRepository, ChapterEnrollmentRepository chapterEnrollmentRepository) {
+    public CourseService(CourseRepository courseRepository, UserRepository userRepository, CourseEnrollmentRepository courseEnrollmentRepository, ChapterEnrollmentRepository chapterEnrollmentRepository, DataSource dataSource) {
         this.courseRepository = courseRepository;
         this.userRepository = userRepository;
         this.courseEnrollmentRepository = courseEnrollmentRepository;
         this.chapterEnrollmentRepository = chapterEnrollmentRepository;
+        this.dataSource = dataSource;
     }
 
     public List<Course> getCourses() {
@@ -234,27 +241,53 @@ public class CourseService {
     public void updateCourse(String courseId, CourseDto courseDto) {
         Course course = checkIfCoursePresentByUrl(courseId);
 
-        if (courseDto.getCourseName() != null) {
-            course.setCourseName(courseDto.getCourseName());
+        StringBuilder sql = new StringBuilder("UPDATE course c SET ");
+        String where = " WHERE course_youtube_id = '" + course.getCourseYoutubeId() + "'";
+        String[] conditions = new String[6];
+        int k = 0;
+
+        if (courseDto.getCourseName() != null && !course.getCourseName().equals(courseDto.getCourseName())) {
+            conditions[k++] = "course_name = '" + courseDto.getCourseName() + "'";
         }
-        if (courseDto.getCourseYoutubeId() != null) {
-            course.setCourseYoutubeId(courseDto.getCourseYoutubeId());
+        if (courseDto.getCourseYoutubeId() != null && !course.getCourseYoutubeId().equals(courseDto.getCourseYoutubeId())) {
+            conditions[k++] = "course_youtube_id = '" + courseDto.getCourseYoutubeId() + "'";
         }
-        if (courseDto.getDescription() != null) {
-            course.setDescription(courseDto.getDescription());
+        if (courseDto.getDescription() != null && !course.getDescription().equals(courseDto.getDescription())) {
+            conditions[k++] = "description = '" + courseDto.getDescription() + "'";
         }
-        if (courseDto.getPrice() != null) {
-            course.setPrice(courseDto.getPrice());
+        if (courseDto.getPrice() != null && !Objects.equals(course.getPrice(), courseDto.getPrice())) {
+            conditions[k++] = "price = '" + courseDto.getPrice() + "'";
         }
-        if (courseDto.getNumberOfChapters() != null) {
-            course.setNumberOfChapters(courseDto.getNumberOfChapters());
+        if (courseDto.getNumberOfChapters() != null && !Objects.equals(course.getNumberOfChapters(), courseDto.getNumberOfChapters())) {
+            conditions[k++] = "number_of_chapters = '" + courseDto.getNumberOfChapters() + "'";
         }
 
-        courseRepository.save(course);
+        if (k > 0) {
+            for (int i = 0; i < k; i++) {
+                if (conditions[i] != null) {
+                    if (i > 0) {
+                        sql.append(", ");
+                    }
+                    sql.append(conditions[i]);
+                }
+            }
+            sql.append(where);
+
+            try (Connection connection = dataSource.getConnection();
+                 PreparedStatement preparedStatement = connection.prepareStatement(sql.toString())) {
+                preparedStatement.execute();
+            } catch (SQLException e) {
+                throw new BadRequestException(e);
+            }
+        }
     }
 
     public void deleteCourse(String courseId) {
         Course course = checkIfCoursePresentByUrl(courseId);
         courseRepository.delete(course);
+    }
+
+    public Course getCourseByCourseId(String courseId) {
+        return checkIfCoursePresentByUrl(courseId);
     }
 }
