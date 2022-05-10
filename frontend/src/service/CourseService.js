@@ -227,6 +227,40 @@ class CourseService {
       },
     });
   }
+
+  getCourseByCourseId(token, courseId) {
+    return axios.get(COURSE_API_URL + "/single?courseId=" + courseId, {
+      headers: {
+        Authorization: "Bearer " + token
+      }
+    })
+  }
+
+  editCourse(coursePayload, token, courseId) {
+    return axios.put(COURSE_API_URL + "/edit?courseId=" + courseId,
+    {
+      numberOfChapters: coursePayload.numberOfChapters,
+      courseYoutubeId: coursePayload.courseLink,
+      courseName: coursePayload.courseName,
+      price: coursePayload.price,
+      description: coursePayload.description
+    },
+    {
+      headers: {
+        Authorization: "Bearer " + token
+      }
+    })
+  }
+
+  deleteCourse(token, courseId) {
+    return axios.delete(COURSE_API_URL + "/delete?courseId=" + courseId, 
+    {
+      headers: {
+        Authorization: "Bearer " + token
+      } 
+    })
+  }
+
 }
 
 export default new CourseService();

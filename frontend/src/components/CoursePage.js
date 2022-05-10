@@ -8,6 +8,8 @@ import update from "react-addons-update";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faWindowClose } from "@fortawesome/fontawesome-free-solid";
+import { faInfoCircle } from "@fortawesome/fontawesome-free-solid";
+import { toHaveStyle } from "@testing-library/jest-dom/dist/matchers";
 
 const YOUTUBE_PLAYLIST_ITEMS_API =
   "https://www.googleapis.com/youtube/v3/playlistItems";
@@ -33,10 +35,19 @@ class CoursePage extends React.Component {
       modalQuestionsTexts: ["", "", "", "", ""],
       showCreateAssessmentModal: false,
       showTakeAssessmentModal: false,
+      showEditCourseModal: false,
       questions: [""],
       questionsTexts: ["", "", "", "", ""],
       isAssessmentTaken: false,
-      isCourseVisible: false
+      isCourseVisible: false,
+      playlistName: "",
+      courseDetails: {
+        numberOfChapters: 0,
+        courseLink: "",
+        courseName: "",
+        price: 0.0,
+        description: "",
+      }
     };
   }
 
@@ -48,9 +59,12 @@ class CoursePage extends React.Component {
     const playlistName = playlistUrl.split("=")[3].replace("-", " ");
     const chapters = playlistUrl.split("=")[2].split("&")[0];
 
+
+
     this.setState({
       numberOfChapters: chapters,
       courseId: playlistId,
+      playlistName: playlistName
     });
 
     await this.checkValidPlaylist(playlistId);
@@ -83,7 +97,6 @@ class CoursePage extends React.Component {
           playlistId
         )
           .then((res) => {
-            console.log(res);
             this.setState({
               isAssessmentTaken: res.data,
             });
@@ -117,7 +130,6 @@ class CoursePage extends React.Component {
             this.state.isCertificationObtained === true ||
             this.state.isAssessmentTaken === true
           ) {
-            console.log('here');
             document.getElementById("take-assessment").style.display = "none";
           }
         });
@@ -160,8 +172,6 @@ class CoursePage extends React.Component {
                 existsAssessment: true,
               });
             }
-  
-            console.log(this.state);
           })
           .catch((ex) => {});
   
@@ -170,12 +180,57 @@ class CoursePage extends React.Component {
           this.state.instrutorEmail === localStorage.getItem("user")
         ) {
           document.getElementById("create-assessment").style.display = "block";
+          document.getElementById("edit-course").style.right = "388px";
         } else {
           document.getElementById("create-assessment").style.display = "none";
+          document.getElementById("set-availability").style.right = "15px";
+          document.getElementById("edit-course").style.right = "188px";
+        }
+
+        if (!this.state.isCourseVisible) {
+          document.getElementById("edit-course").style.right = parseInt(document.getElementById("edit-course").style.right.split("px")[0] - 18) + "px";
         }
 
         if (this.state.instrutorEmail === localStorage.getItem("user")) {
           document.getElementById("set-availability").style.display = "block";
+
+          await CourseService.getCourseByCourseId(localStorage.getItem('token'), playlistId)
+          .then(res => {
+            this.state.courseDetails.courseLink = res.data.courseYoutubeId;
+            this.state.courseDetails.courseName = res.data.courseName;
+            this.state.courseDetails.numberOfChapters = res.data.numberOfChapters;
+            this.state.courseDetails.price = res.data.price;
+            this.state.courseDetails.description = res.data.description;
+
+            if (chapters != res.data.numberOfChapters) {
+              toast.error("Invalid number of chapters required!", {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+              });
+              setTimeout(function() {
+                window.location.href = "/courses";
+              }, 2500)
+            }
+          })  
+          .catch((ex) => {
+            toast.error("Course unavailable with id: " + playlistId, {
+              position: "top-right",
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+            });
+            setTimeout(function () {
+              window.location.href = "/courses";
+            }, 2500);
+          })
         }
         else {
           document.getElementById("set-availability").style.display = "none";
@@ -220,7 +275,7 @@ class CoursePage extends React.Component {
     )
       .then((res) => {
         this.setState({
-          isCourseValid: res.data,
+          isCourseValid: res.data ? true : false,
         });
       })
       .catch((ex) => {
@@ -250,6 +305,100 @@ class CoursePage extends React.Component {
       });
   };
 
+  editCourse = async (event, courseId) => {
+    event.preventDefault();
+
+    var expression =
+      /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi;
+    var regex = new RegExp(expression);
+    if (
+      this.state.courseDetails.courseLink.match(regex) &&
+      this.state.courseDetails.courseName.length > 3 &&
+      this.state.courseDetails.numberOfChapters > 0 &&
+      this.state.courseDetails.description.length > 25 &&
+      this.state.courseDetails.price >= 0
+    ) {
+      if (localStorage.getItem("token")) {
+        await CourseService.editCourse(
+          this.state.courseDetails,
+          localStorage.getItem("token"),
+          courseId
+        )
+          .then((res) => {
+            toast.success("Course updated.", {
+              position: "top-right",
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+            });
+            let loc = window.location.href.toString();
+            loc = loc.replace("chapters=" + this.state.numberOfChapters, "chapters=" + this.state.courseDetails.numberOfChapters);
+            loc = loc.replace("playlistName=" + this.state.playlistName, "chapters=" + this.state.courseDetails.courseName);
+
+            setTimeout(function() {
+              window.location.href = loc;
+            }, 2500);
+          })
+          .catch((ex) => {
+            const errorMessage =
+              ex.response !== undefined
+                ? ex.response.data.message
+                : "Backend is down!";
+            toast.error("Courses page could not be loaded! " + errorMessage, {
+              position: "top-right",
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+            });
+
+            if (
+              ex.response !== undefined &&
+              ex.response.data.message.includes("expire")
+            ) {
+              setTimeout(function () {
+                localStorage.clear();
+                window.location.href = "/login";
+              }, 2500);
+            }
+          });
+        this.setState({ showModal: false });
+      } else {
+        toast.error(
+          "No token present in localStorage. Redirected to login page! ",
+          {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          }
+        );
+        setTimeout(function () {
+          localStorage.clear();
+          window.location.href = "/login";
+        }, 2500);
+      }
+    } else {
+      toast.error("Recheck the requirements for each field.", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+    }
+  }
+
   renderData = async (playlistId, playlistName, chapters) => {
     await fetch(
       `${YOUTUBE_PLAYLIST_ITEMS_API}?part=snippet&maxResults=${chapters}&playlistId=${playlistId}&key=${process.env.REACT_APP_API_YOUTUBE}`
@@ -262,16 +411,16 @@ class CoursePage extends React.Component {
               {playlistName} 
             </h1>
             <button
-            type="button"
-            style={{
-              display: "none",
-            }}
-            className=""
-            id="set-availability"
-            onClick={() => this.handleSetCourseAvailability(playlistId)}
-          >
-            {this.state.isCourseVisible ? "Make Unavailable" : "Make Available"}
-          </button>
+              type="button"
+              style={{
+                display: "none",
+              }}
+              className=""
+              id="set-availability"
+              onClick={() => this.handleSetCourseAvailability(playlistId)}
+            >
+              {this.state.isCourseVisible ? "Make Unavailable" : "Make Available"}
+            </button>
             <ul className="chapters">
               {data?.items?.map((item) => {
                 const { id, snippet = {} } = item;
@@ -349,7 +498,6 @@ class CoursePage extends React.Component {
   async handleSetCourseAvailability(courseId) {
     await CourseService.setCourseAvailability(this.state.isCourseVisible, localStorage.getItem('token'), courseId)
     .then(() => {
-      console.log(this.state.isCourseVisible);
       let message = this.state.isCourseVisible ? "Course is now unavailble" : "Course is now available";
       toast.success(
         message,
@@ -484,14 +632,12 @@ class CoursePage extends React.Component {
   }
 
   async handleCompleteCourse() {
-    console.log(this.state);
     if (
       this.state.existsAssessment === true &&
       this.state.isAssessmentTaken === false
     ) {
       this.setState({ showTakeAssessmentModal: true });
     } else {
-      console.log(this.state);
       await CourseService.completeCourse(
         localStorage.getItem("user"),
         localStorage.getItem("token"),
@@ -530,9 +676,7 @@ class CoursePage extends React.Component {
         ],
         modalQuestionsTexts: [...prevState.modalQuestionsTexts, ""],
       }));
-      console.log(this.state);
       if (this.state.numberOfQuestions === 5) {
-        console.log(document.getElementById("add-question").style);
         document.getElementById("add-question").style.display = "none";
         document.getElementById("add-assessment").style.marginLeft = "20%";
       }
@@ -547,7 +691,6 @@ class CoursePage extends React.Component {
           (_, i) => i !== this.state.numberOfQuestions
         ),
       });
-      console.log(this.state);
     }
   }
 
@@ -638,7 +781,6 @@ class CoursePage extends React.Component {
         this.state.questions[i] + "##" + this.state.questionsTexts[i]
       );
     }
-    console.log(resultQuestions);
 
     await CourseService.submitAssessment(
       localStorage.getItem("token"),
@@ -650,7 +792,6 @@ class CoursePage extends React.Component {
         this.setState({
           showTakeAssessmentModal: false,
         });
-        console.log(this.state);
         toast.success("Assessment submitted!", {
           position: "top-right",
           autoClose: 5000,
@@ -717,6 +858,30 @@ class CoursePage extends React.Component {
           onClick={() => this.setState({ showCreateAssessmentModal: true })}
         >
           Create Assessment
+        </button>
+        <button
+          type="button"
+          style={{
+            display: this.state.instrutorEmail === localStorage.getItem('user') ? "block" : "none",
+          }}
+          id="edit-course"
+          onClick={() => {
+            if (this.state.isCourseVisible) {
+              toast.error("You have to make the course unvailable in order to edit it.", {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+              })
+              return;
+            }
+            this.setState({ showEditCourseModal: true}) 
+          }}
+        >
+          Edit Course
         </button>
 
         <Modal
@@ -829,6 +994,136 @@ class CoursePage extends React.Component {
                 style={{ marginLeft: "20%" }}
                 onClick={this.handleSubmitAssessment.bind(this)}
                 value="SUBMIT ASSESSMENT"
+              />
+            </div>
+          </form>
+        </Modal>
+
+        <Modal
+          isOpen={this.state.showEditCourseModal}
+          onRequestClose={() => this.setState({ showEditCourseModal: false })}
+          contentLabel="EDIT COURSE"
+          className="edit-course"
+          overlayClassName="myoverlay"
+          closeTimeoutMS={500}
+        >
+          <h2 id="header-form">Edit Course</h2>
+          <form id="form-edit-course">
+            <div className="form-inner">
+              <div className="form-group">
+                <label htmlFor="course-name">
+                  Name:{" "}
+                  <FontAwesomeIcon
+                    icon={faInfoCircle}
+                    title="The course name should have at least 3 characters."
+                  />
+                </label>
+                <input
+                  type="text"
+                  name="course-name"
+                  id="course-name"
+                  onChange={(e) =>
+                    this.setState((prevState) => ({
+                      courseDetails: {
+                        ...prevState.courseDetails,
+                        courseName: e.target.value,
+                      },
+                    }))
+                  }
+                  value={this.state.courseDetails.courseName}
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="number-chapters">
+                  Number of chapters:{" "}
+                  <FontAwesomeIcon
+                    icon={faInfoCircle}
+                    title="You should have at least one chapter."
+                  />
+                </label>
+                <input
+                  type="number"
+                  name="number-chapters"
+                  id="number-chapters"
+                  onChange={(e) =>
+                    this.setState((prevState) => ({
+                      courseDetails: {
+                        ...prevState.courseDetails,
+                        numberOfChapters: e.target.value,
+                      },
+                    }))
+                  }
+                  value={this.state.courseDetails.numberOfChapters}
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="course-link">
+                  Course Playlist Link:{" "}
+                  <FontAwesomeIcon
+                    icon={faInfoCircle}
+                    title="It should be a valid HTTPS link. Please add here the link from your first chapter including the playlistId. E.g.: https://www.youtube.com/watch?v=VHbSopMyc4M&list=PLBlnK6fEyqRjKA_NuK9mHmlk0dZzuP1P5"
+                  />
+                </label>
+                <input
+                  type="text"
+                  name="course-link"
+                  id="course-link"
+                  onChange={(e) =>
+                    this.setState((prevState) => ({
+                      courseDetails: {
+                        ...prevState.courseDetails,
+                        courseLink: e.target.value,
+                      },
+                    }))
+                  }
+                  value={this.state.courseDetails.courseLink}
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="course-price">Price: </label>
+                <input
+                  type="number"
+                  name="course-price"
+                  id="course-price"
+                  onChange={(e) =>
+                    this.setState((prevState) => ({
+                      courseDetails: {
+                        ...prevState.courseDetails,
+                        price: e.target.value,
+                      },
+                    }))
+                  }
+                  value={this.state.courseDetails.price}
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="course-description">
+                  Description:{" "}
+                  <FontAwesomeIcon
+                    icon={faInfoCircle}
+                    title="The description should contain at least 25 characters."
+                  />
+                </label>
+                <input
+                  type="text"
+                  name="course-description"
+                  id="course-description"
+                  onChange={(e) =>
+                    this.setState((prevState) => ({
+                      courseDetails: {
+                        ...prevState.courseDetails,
+                        description: e.target.value,
+                      },
+                    }))
+                  }
+                  value={this.state.courseDetails.description}
+                />
+              </div>
+
+              <input
+                type="submit"
+                onClick={(event) => this.editCourse(event, this.state.courseId)}
+                value="EDIT COURSE"
               />
             </div>
           </form>
