@@ -230,4 +230,31 @@ public class CourseService {
     public Boolean getCourseAvailability(String courseId) {
         return courseRepository.findByCourseYoutubeId(courseId).orElseThrow().getIsVisible();
     }
+
+    public void updateCourse(String courseId, CourseDto courseDto) {
+        Course course = checkIfCoursePresentByUrl(courseId);
+
+        if (courseDto.getCourseName() != null) {
+            course.setCourseName(courseDto.getCourseName());
+        }
+        if (courseDto.getCourseYoutubeId() != null) {
+            course.setCourseYoutubeId(courseDto.getCourseYoutubeId());
+        }
+        if (courseDto.getDescription() != null) {
+            course.setDescription(courseDto.getDescription());
+        }
+        if (courseDto.getPrice() != null) {
+            course.setPrice(courseDto.getPrice());
+        }
+        if (courseDto.getNumberOfChapters() != null) {
+            course.setNumberOfChapters(courseDto.getNumberOfChapters());
+        }
+
+        courseRepository.save(course);
+    }
+
+    public void deleteCourse(String courseId) {
+        Course course = checkIfCoursePresentByUrl(courseId);
+        courseRepository.delete(course);
+    }
 }

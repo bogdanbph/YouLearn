@@ -114,4 +114,16 @@ public class CourseController {
     public ResponseEntity<Boolean> getCourseAvailability(@RequestParam("courseId") String courseId) {
         return new ResponseEntity<>(courseService.getCourseAvailability(courseId), HttpStatus.OK);
     }
+
+    @PutMapping
+    @RequestMapping
+    public void updateCourse(@RequestParam("courseId") String courseId, @RequestBody CourseDto courseDto) {
+        courseService.updateCourse(courseId, courseDto);
+    }
+
+    @DeleteMapping
+    @RequestMapping
+    public void deleteCourse(@RequestParam("courseId") String courseId) {
+        courseService.deleteCourse(courseId);
+    }
 }
