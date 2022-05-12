@@ -41,6 +41,9 @@ class CoursePage extends React.Component {
       isAssessmentTaken: false,
       isCourseVisible: false,
       playlistName: "",
+      description: "",
+      price: 0.0,
+      courseName: "",
       courseDetails: {
         numberOfChapters: 0,
         courseLink: "",
@@ -180,7 +183,12 @@ class CoursePage extends React.Component {
           this.state.instrutorEmail === localStorage.getItem("user")
         ) {
           document.getElementById("create-assessment").style.display = "block";
-          document.getElementById("edit-course").style.right = "388px";
+          if (this.state.isCourseValid === true) {
+            document.getElementById("edit-course").style.right = "380px";
+          }
+          else {
+            document.getElementById("edit-course").style.right = "388px";
+          }
         } else {
           document.getElementById("create-assessment").style.display = "none";
           document.getElementById("set-availability").style.right = "15px";
@@ -201,6 +209,10 @@ class CoursePage extends React.Component {
             this.state.courseDetails.numberOfChapters = res.data.numberOfChapters;
             this.state.courseDetails.price = res.data.price;
             this.state.courseDetails.description = res.data.description;
+
+            this.state.courseName = res.data.courseName;
+            this.state.description = res.data.description;
+            this.state.price = res.data.price;
 
             if (chapters != res.data.numberOfChapters) {
               toast.error("Invalid number of chapters required!", {
@@ -308,6 +320,26 @@ class CoursePage extends React.Component {
   editCourse = async (event, courseId) => {
     event.preventDefault();
 
+    let newCourseId = this.state.courseDetails.courseLink.split("&")[1].split("=")[1];
+    console.log(this.state);
+    if (this.state.price === this.state.courseDetails.price 
+      && this.state.description === this.state.courseDetails.description
+      && parseInt(this.state.numberOfChapters) === this.state.courseDetails.numberOfChapters
+      && this.state.courseName === this.state.courseDetails.courseName
+      && this.state.courseId === newCourseId) {
+        toast.success("Nothing has been changed.", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+
+        return;
+      }
+
     var expression =
       /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi;
     var regex = new RegExp(expression);
@@ -336,7 +368,8 @@ class CoursePage extends React.Component {
             });
             let loc = window.location.href.toString();
             loc = loc.replace("chapters=" + this.state.numberOfChapters, "chapters=" + this.state.courseDetails.numberOfChapters);
-            loc = loc.replace("playlistName=" + this.state.playlistName, "chapters=" + this.state.courseDetails.courseName);
+            loc = loc.replace("playlistName=" + this.state.playlistName, "playlistName=" + this.state.courseDetails.courseName);
+            loc = loc.replace("playlistId=" + courseId, "playlistId=" + this.state.courseDetails.courseLink.split("&")[1].split("=")[1]);
 
             setTimeout(function() {
               window.location.href = loc;
