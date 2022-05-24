@@ -441,7 +441,7 @@ class CoursePage extends React.Component {
         body: (
           <main className="course-container">
             <h1 className="course-title" style={{ marginLeft: "10%" }}>
-              {playlistName} 
+              {playlistName.replaceAll("%20", " ")} 
             </h1>
             <button
               type="button"
