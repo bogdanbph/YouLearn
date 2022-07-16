@@ -921,7 +921,25 @@ class CoursePage extends React.Component {
             display: "none",
           }}
           id="create-assessment"
-          onClick={() => this.setState({ showCreateAssessmentModal: true })}
+          onClick={() => {
+              if (this.state.isCourseVisible) {
+                toast.error(
+                  "You have to make the course unvailable in order to add an assessment.",
+                  {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                 }
+                );
+                return;
+              }
+              this.setState({ showCreateAssessmentModal: true })
+            }
+          }
         >
           Create Assessment
         </button>

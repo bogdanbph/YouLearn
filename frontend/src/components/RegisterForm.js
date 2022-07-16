@@ -69,6 +69,7 @@ const RegisterForm = (props) => {
               onChange={(e) =>
                 setDetails({ ...details, firstName: e.target.value })
               }
+              minLength="3"
               value={details.firstName}
             />
           </div>
@@ -78,6 +79,7 @@ const RegisterForm = (props) => {
               type="text"
               name="last-name"
               id="last-name"
+              minLength="3"
               onChange={(e) =>
                 setDetails({ ...details, lastName: e.target.value })
               }
@@ -154,7 +156,7 @@ const RegisterForm = (props) => {
               value={details.role}
             >
               <option value="REGULAR_USER">Free</option>
-              <option value="PREMIUM_USER">Premium</option>
+              {/* <option value="PREMIUM_USER">Premium</option> */}
               <option value="INSTRUCTOR">Instructor</option>
             </select>
           </div>
