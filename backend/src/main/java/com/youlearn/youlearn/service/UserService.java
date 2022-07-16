@@ -129,7 +129,7 @@ public class UserService implements UserDetailsService {
             certificationDto.setCourseName(course.getCourseName());
             certificationDto.setRegisteredAt(completedCourseForUserId.getRegisteredAt());
             certificationDto.setCompletedAt(completedCourseForUserId.getCompletedAt());
-            certificationDto.setInstructorName(user.getFirstName() + " " + user.getLastName());
+            certificationDto.setInstructorName(course.getNameInstructor());
 
             certificationDtos.add(certificationDto);
         }
