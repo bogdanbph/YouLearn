@@ -3,6 +3,7 @@ import NavigationBar from "./NavigationBar";
 import "../styles/HomePage.css";
 import UserService from "../service/UserService";
 import { toast } from "react-toastify";
+import jwtDecode from "jwt-decode";
 
 class HomePage extends React.Component {
   constructor(props) {
@@ -10,6 +11,25 @@ class HomePage extends React.Component {
   }
 
   async componentDidMount() {
+    const token = localStorage.getItem("token");
+    const decodedToken = jwtDecode(token);
+
+    if (decodedToken.exp * 1000 < new Date().getTime()) {
+      toast.error("Token expired!", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+      setInterval(function () {
+        localStorage.clear();
+        window.location.href = "/login";
+      }, 1500);
+    }
+
     if (localStorage.getItem("role") === null && localStorage.getItem("user")) {
       await UserService.retrieveRoleForUser(
         localStorage.getItem("user"),
@@ -23,7 +43,7 @@ class HomePage extends React.Component {
             ex.response !== undefined
               ? ex.response.data.message
               : "Backend is down!";
-          toast.error("Register failed! " + errorMessage, {
+          toast.error("Unexpected error! " + errorMessage, {
             position: "top-right",
             autoClose: 5000,
             hideProgressBar: false,
