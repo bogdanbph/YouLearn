@@ -22,8 +22,8 @@ public class TokenService {
         return tokenRepository.findByToken(tokenString);
     }
 
-    public int setConfrimedAt(String token) {
-        return tokenRepository.updateConfirmedAt(
+    public void setConfirmedAt(String token) {
+        tokenRepository.updateConfirmedAt(
                 token, LocalDateTime.now());
     }
 

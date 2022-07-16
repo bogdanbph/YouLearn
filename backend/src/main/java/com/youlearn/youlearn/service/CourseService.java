@@ -67,6 +67,10 @@ public class CourseService {
         course.setPrice(courseDto.getPrice());
         course.setDescription(courseDto.getDescription());
         course.setNumberOfChapters(courseDto.getNumberOfChapters());
+
+        userRepository.findByEmail(courseDto.getEmailInstructor())
+                .ifPresent(user -> course.setNameInstructor(user.getFirstName() + " " + user.getLastName()));
+
         course.setIsVisible(false);
 
         courseRepository.save(course);

@@ -298,7 +298,7 @@ public class AssessmentService {
         }
 
         CourseEnrollment courseEnrollment = optionalCourseEnrollment.get();
-        if (courseEnrollment.isGradeSubmitted() == true) {
+        if (courseEnrollment.isGradeSubmitted()) {
             throw new BadRequestException("This assessment has been already submitted.");
         }
 

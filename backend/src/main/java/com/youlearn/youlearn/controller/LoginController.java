@@ -12,6 +12,6 @@ public class LoginController {
 
     @GetMapping
     private void login() {
-
+        // TODO document why this method is empty
     }
 }

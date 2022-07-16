@@ -29,7 +29,7 @@ public class RegistrationService {
 
     public String registerUser(RegistrationRequest request) {
         boolean isValid = emailService.test(request.getEmail());
-        boolean isValidPassword = request.getPassword().matches("^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,}$");
+        boolean isValidPassword = request.getPassword().matches("^(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,}$");
 
         if (!isValid) {
             throw new BadRequestException("Email format is not correct.");
@@ -73,7 +73,7 @@ public class RegistrationService {
             throw new BadRequestException("The token is expired!");
         }
 
-        tokenService.setConfrimedAt(tokenString);
+        tokenService.setConfirmedAt(tokenString);
         userService.enableUser(token.getUser().getEmail());
 
     }

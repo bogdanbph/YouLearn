@@ -5,7 +5,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
 import java.util.Set;
 
 @Getter
@@ -32,6 +38,7 @@ public class Course {
 
     private String courseName;
     private String emailInstructor;
+    private String nameInstructor;
     private Integer numberOfChapters;
     private String courseYoutubeId;
     private Float price;

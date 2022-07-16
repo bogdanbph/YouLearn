@@ -7,19 +7,19 @@ public abstract class BaseException extends RuntimeException {
     private final HttpStatus httpStatus;
     private final String message;
 
-    public BaseException(HttpStatus httpStatus, String message) {
+    protected BaseException(HttpStatus httpStatus, String message) {
         super(message);
         this.httpStatus = httpStatus;
         this.message = message;
     }
 
-    public BaseException(HttpStatus httpStatus, String message, Throwable cause) {
+    protected BaseException(HttpStatus httpStatus, String message, Throwable cause) {
         super(cause);
         this.httpStatus = httpStatus;
         this.message = message;
     }
 
-    public BaseException(Throwable cause) {
+    protected BaseException(Throwable cause) {
         super(cause);
         this.httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
         this.message = "Internal Server Error";
