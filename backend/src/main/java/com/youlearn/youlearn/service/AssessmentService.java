@@ -12,8 +12,6 @@ import com.youlearn.youlearn.repository.CourseRepository;
 import com.youlearn.youlearn.repository.QuestionRepository;
 import com.youlearn.youlearn.repository.UserRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.ui.ModelMap;
-import org.springframework.web.servlet.ModelAndView;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
@@ -300,7 +298,7 @@ public class AssessmentService {
         }
 
         CourseEnrollment courseEnrollment = optionalCourseEnrollment.get();
-        if (courseEnrollment.isGradeSubmmited() == true) {
+        if (courseEnrollment.isGradeSubmitted() == true) {
             throw new BadRequestException("This assessment has been already submitted.");
         }
 
