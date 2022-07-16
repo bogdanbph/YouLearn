@@ -101,8 +101,25 @@ const RegisterForm = (props) => {
               Password:{" "}
               <FontAwesomeIcon
                 icon={faInfoCircle}
-                title="The password should contain one capital letter, one number and at least 8 characters."
+                title="The password should contain one capital letter, one number, a special character and at least 8 characters in total."
               />
+              <i
+                class="far fa-eye"
+                id="togglePassword"
+                style={{
+                  marginLeft: "15px",
+                  cursor: "pointer",
+                  display: "inline-block",
+                }}
+                onClick={(e) => {
+                  const password = document.getElementById("password");
+                  const type =
+                    password.getAttribute("type") === "password"
+                      ? "text"
+                      : "password";
+                  password.setAttribute("type", type);
+                }}
+              ></i>
             </label>
             <input
               type="password"

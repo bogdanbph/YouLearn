@@ -12,22 +12,24 @@ class HomePage extends React.Component {
 
   async componentDidMount() {
     const token = localStorage.getItem("token");
-    const decodedToken = jwtDecode(token);
 
-    if (decodedToken.exp * 1000 < new Date().getTime()) {
-      toast.error("Token expired!", {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
-      setInterval(function () {
-        localStorage.clear();
-        window.location.href = "/login";
-      }, 1500);
+    if (token !== null && token !== undefined) {
+      const decodedToken = jwtDecode(token);
+      if (decodedToken.exp * 1000 < new Date().getTime()) {
+        toast.error("Token expired!", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+        setInterval(function () {
+          localStorage.clear();
+          window.location.href = "/login";
+        }, 1500);
+      }
     }
 
     if (localStorage.getItem("role") === null && localStorage.getItem("user")) {

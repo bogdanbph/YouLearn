@@ -36,7 +36,26 @@ const LoginForm = (props) => {
             />
           </div>
           <div className="form-group">
-            <label htmlFor="password">Password: </label>
+            <label htmlFor="password">
+              Password:{" "}
+              <i
+                class="far fa-eye"
+                id="togglePassword"
+                style={{
+                  marginLeft: "5px",
+                  cursor: "pointer",
+                  display: "inline-block",
+                }}
+                onClick={(e) => {
+                  const password = document.getElementById("password");
+                  const type =
+                    password.getAttribute("type") === "password"
+                      ? "text"
+                      : "password";
+                  password.setAttribute("type", type);
+                }}
+              ></i>
+            </label>
             <input
               type="password"
               name="password"

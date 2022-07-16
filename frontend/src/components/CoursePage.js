@@ -50,7 +50,7 @@ class CoursePage extends React.Component {
         courseName: "",
         price: 0.0,
         description: "",
-      }
+      },
     };
   }
 
@@ -62,23 +62,24 @@ class CoursePage extends React.Component {
     const playlistName = playlistUrl.split("=")[3].replace("-", " ");
     const chapters = playlistUrl.split("=")[2].split("&")[0];
 
-
-
     this.setState({
       numberOfChapters: chapters,
       courseId: playlistId,
-      playlistName: playlistName
+      playlistName: playlistName,
     });
 
     await this.checkValidPlaylist(playlistId);
     if (this.state.isCourseValid === true) {
-      await CourseService.getCourseAvailability(localStorage.getItem("token"), playlistId)
-      .then((res) => {
-        this.setState({
-          isCourseVisible: res.data
+      await CourseService.getCourseAvailability(
+        localStorage.getItem("token"),
+        playlistId
+      )
+        .then((res) => {
+          this.setState({
+            isCourseVisible: res.data,
+          });
         })
-      })
-      .catch(ex => {})
+        .catch((ex) => {});
 
       await CourseService.retrieveInstructorEmail(
         localStorage.getItem("token"),
@@ -91,7 +92,10 @@ class CoursePage extends React.Component {
         })
         .catch((ex) => {});
 
-      if (this.state.isCourseVisible === true || this.state.instrutorEmail === localStorage.getItem('user')) {
+      if (
+        this.state.isCourseVisible === true ||
+        this.state.instrutorEmail === localStorage.getItem("user")
+      ) {
         await this.renderData(playlistId, playlistName, chapters);
 
         await CourseService.isAssessmentTaken(
@@ -105,7 +109,7 @@ class CoursePage extends React.Component {
             });
           })
           .catch((ex) => {});
-  
+
         if (this.state.isAssessmentTaken === false) {
           await CourseService.retrieveQuestions(
             localStorage.getItem("token"),
@@ -119,7 +123,7 @@ class CoursePage extends React.Component {
             })
             .catch((ex) => {});
         }
-  
+
         await CourseService.checkIfCertificationIsObtained(
           localStorage.getItem("user"),
           localStorage.getItem("token"),
@@ -128,7 +132,7 @@ class CoursePage extends React.Component {
           this.setState({
             isCertificationObtained: res.data,
           });
-  
+
           if (
             this.state.isCertificationObtained === true ||
             this.state.isAssessmentTaken === true
@@ -154,8 +158,8 @@ class CoursePage extends React.Component {
                 if (
                   this.state.numberOfChapters ==
                     this.state.numberOfCompletedChapters &&
-                  this.state.isCertificationObtained === false
-                  && this.state.isAssessmentTaken === false
+                  this.state.isCertificationObtained === false &&
+                  this.state.isAssessmentTaken === false
                 ) {
                   document.getElementById("take-assessment").style.display =
                     "block";
@@ -164,7 +168,7 @@ class CoursePage extends React.Component {
             });
           }
         );
-  
+
         await CourseService.checkIfAssessmentExistsForCourse(
           localStorage.getItem("token"),
           playlistId
@@ -177,7 +181,7 @@ class CoursePage extends React.Component {
             }
           })
           .catch((ex) => {});
-  
+
         if (
           this.state.existsAssessment === false &&
           this.state.instrutorEmail === localStorage.getItem("user")
@@ -185,8 +189,7 @@ class CoursePage extends React.Component {
           document.getElementById("create-assessment").style.display = "block";
           if (this.state.isCourseValid === true) {
             document.getElementById("edit-course").style.right = "380px";
-          }
-          else {
+          } else {
             document.getElementById("edit-course").style.right = "388px";
           }
         } else {
@@ -196,26 +199,50 @@ class CoursePage extends React.Component {
         }
 
         if (!this.state.isCourseVisible) {
-          document.getElementById("edit-course").style.right = parseInt(document.getElementById("edit-course").style.right.split("px")[0] - 18) + "px";
+          document.getElementById("edit-course").style.right =
+            parseInt(
+              document
+                .getElementById("edit-course")
+                .style.right.split("px")[0] - 18
+            ) + "px";
         }
 
         if (this.state.instrutorEmail === localStorage.getItem("user")) {
           document.getElementById("set-availability").style.display = "block";
 
-          await CourseService.getCourseByCourseId(localStorage.getItem('token'), playlistId)
-          .then(res => {
-            this.state.courseDetails.courseLink = res.data.courseYoutubeId;
-            this.state.courseDetails.courseName = res.data.courseName;
-            this.state.courseDetails.numberOfChapters = res.data.numberOfChapters;
-            this.state.courseDetails.price = res.data.price;
-            this.state.courseDetails.description = res.data.description;
+          await CourseService.getCourseByCourseId(
+            localStorage.getItem("token"),
+            playlistId
+          )
+            .then((res) => {
+              this.state.courseDetails.courseLink = res.data.courseYoutubeId;
+              this.state.courseDetails.courseName = res.data.courseName;
+              this.state.courseDetails.numberOfChapters =
+                res.data.numberOfChapters;
+              this.state.courseDetails.price = res.data.price;
+              this.state.courseDetails.description = res.data.description;
 
-            this.state.courseName = res.data.courseName;
-            this.state.description = res.data.description;
-            this.state.price = res.data.price;
+              this.state.courseName = res.data.courseName;
+              this.state.description = res.data.description;
+              this.state.price = res.data.price;
 
-            if (chapters != res.data.numberOfChapters) {
-              toast.error("Invalid number of chapters required!", {
+              if (chapters != res.data.numberOfChapters) {
+                toast.error("Invalid number of chapters required!", {
+                  position: "top-right",
+                  autoClose: 5000,
+                  hideProgressBar: false,
+                  closeOnClick: true,
+                  pauseOnHover: true,
+                  draggable: true,
+                  progress: undefined,
+                });
+                setTimeout(function () {
+                  window.location.href = "/courses";
+                }, 2500);
+              }
+            })
+            .catch((ex) => {
+              toast.error("Course unavailable with id: " + playlistId, {
                 position: "top-right",
                 autoClose: 5000,
                 hideProgressBar: false,
@@ -224,40 +251,26 @@ class CoursePage extends React.Component {
                 draggable: true,
                 progress: undefined,
               });
-              setTimeout(function() {
+              setTimeout(function () {
                 window.location.href = "/courses";
-              }, 2500)
-            }
-          })  
-          .catch((ex) => {
-            toast.error("Course unavailable with id: " + playlistId, {
-              position: "top-right",
-              autoClose: 5000,
-              hideProgressBar: false,
-              closeOnClick: true,
-              pauseOnHover: true,
-              draggable: true,
-              progress: undefined,
+              }, 2500);
             });
-            setTimeout(function () {
-              window.location.href = "/courses";
-            }, 2500);
-          })
-        }
-        else {
+        } else {
           document.getElementById("set-availability").style.display = "none";
         }
-      }
-      else {
-        toast.error("Course with id: " + playlistId + " is not available anymore.", {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-        });
+      } else {
+        toast.error(
+          "Course with id: " + playlistId + " is not available anymore.",
+          {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          }
+        );
         setTimeout(function () {
           window.location.href = "/courses";
         }, 2500);
@@ -320,25 +333,30 @@ class CoursePage extends React.Component {
   editCourse = async (event, courseId) => {
     event.preventDefault();
 
-    let newCourseId = this.state.courseDetails.courseLink.split("&")[1].split("=")[1];
+    let newCourseId = this.state.courseDetails.courseLink
+      .split("&")[1]
+      .split("=")[1];
     console.log(this.state);
-    if (this.state.price === this.state.courseDetails.price 
-      && this.state.description === this.state.courseDetails.description
-      && parseInt(this.state.numberOfChapters) === this.state.courseDetails.numberOfChapters
-      && this.state.courseName === this.state.courseDetails.courseName
-      && this.state.courseId === newCourseId) {
-        toast.success("Nothing has been changed.", {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-        });
+    if (
+      this.state.price === this.state.courseDetails.price &&
+      this.state.description === this.state.courseDetails.description &&
+      parseInt(this.state.numberOfChapters) ===
+        this.state.courseDetails.numberOfChapters &&
+      this.state.courseName === this.state.courseDetails.courseName &&
+      this.state.courseId === newCourseId
+    ) {
+      toast.success("Nothing has been changed.", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
 
-        return;
-      }
+      return;
+    }
 
     var expression =
       /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi;
@@ -367,11 +385,21 @@ class CoursePage extends React.Component {
               progress: undefined,
             });
             let loc = window.location.href.toString();
-            loc = loc.replace("chapters=" + this.state.numberOfChapters, "chapters=" + this.state.courseDetails.numberOfChapters);
-            loc = loc.replace("playlistName=" + this.state.playlistName, "playlistName=" + this.state.courseDetails.courseName);
-            loc = loc.replace("playlistId=" + courseId, "playlistId=" + this.state.courseDetails.courseLink.split("&")[1].split("=")[1]);
+            loc = loc.replace(
+              "chapters=" + this.state.numberOfChapters,
+              "chapters=" + this.state.courseDetails.numberOfChapters
+            );
+            loc = loc.replace(
+              loc.split("&")[2],
+              "playlistName=" + this.state.courseDetails.courseName
+            );
+            loc = loc.replace(
+              "playlistId=" + courseId,
+              "playlistId=" +
+                this.state.courseDetails.courseLink.split("&")[1].split("=")[1]
+            );
 
-            setTimeout(function() {
+            setTimeout(function () {
               window.location.href = loc;
             }, 2500);
           })
@@ -430,7 +458,7 @@ class CoursePage extends React.Component {
         progress: undefined,
       });
     }
-  }
+  };
 
   renderData = async (playlistId, playlistName, chapters) => {
     await fetch(
@@ -441,7 +469,7 @@ class CoursePage extends React.Component {
         body: (
           <main className="course-container">
             <h1 className="course-title" style={{ marginLeft: "10%" }}>
-              {playlistName.replaceAll("%20", " ")} 
+              {playlistName.replaceAll("%20", " ")}
             </h1>
             <button
               type="button"
@@ -452,7 +480,9 @@ class CoursePage extends React.Component {
               id="set-availability"
               onClick={() => this.handleSetCourseAvailability(playlistId)}
             >
-              {this.state.isCourseVisible ? "Make Unavailable" : "Make Available"}
+              {this.state.isCourseVisible
+                ? "Make Unavailable"
+                : "Make Available"}
             </button>
             <ul className="chapters">
               {data?.items?.map((item) => {
@@ -529,12 +559,16 @@ class CoursePage extends React.Component {
   };
 
   async handleSetCourseAvailability(courseId) {
-    await CourseService.setCourseAvailability(this.state.isCourseVisible, localStorage.getItem('token'), courseId)
-    .then(() => {
-      let message = this.state.isCourseVisible ? "Course is now unavailble" : "Course is now available";
-      toast.success(
-        message,
-        {
+    await CourseService.setCourseAvailability(
+      this.state.isCourseVisible,
+      localStorage.getItem("token"),
+      courseId
+    )
+      .then(() => {
+        let message = this.state.isCourseVisible
+          ? "Course is now unavailble"
+          : "Course is now available";
+        toast.success(message, {
           position: "top-right",
           autoClose: 5000,
           hideProgressBar: false,
@@ -542,16 +576,15 @@ class CoursePage extends React.Component {
           pauseOnHover: true,
           draggable: true,
           progress: undefined,
-        }
-      );
-      this.setState({
-        isCourseVisible: !this.state.isCourseVisible
+        });
+        this.setState({
+          isCourseVisible: !this.state.isCourseVisible,
+        });
+        setTimeout(function () {
+          window.location.reload(false);
+        }, 2500);
       })
-      setTimeout(function () {
-        window.location.reload(false);
-      }, 2500);
-    })
-    .catch();
+      .catch();
   }
 
   async handleCompleteChapter(chapterUrl, courseYoutubeId) {
@@ -775,7 +808,7 @@ class CoursePage extends React.Component {
           draggable: true,
           progress: undefined,
         });
-        setTimeout(function() {
+        setTimeout(function () {
           window.location.reload(false);
         }, 2500);
       })
@@ -834,9 +867,9 @@ class CoursePage extends React.Component {
           draggable: true,
           progress: undefined,
         });
-        setTimeout(function() {
+        setTimeout(function () {
           window.location.reload(false);
-        }, 2500)
+        }, 2500);
       })
       .catch((ex) => {
         const errorMessage =
@@ -895,23 +928,29 @@ class CoursePage extends React.Component {
         <button
           type="button"
           style={{
-            display: this.state.instrutorEmail === localStorage.getItem('user') ? "block" : "none",
+            display:
+              this.state.instrutorEmail === localStorage.getItem("user")
+                ? "block"
+                : "none",
           }}
           id="edit-course"
           onClick={() => {
             if (this.state.isCourseVisible) {
-              toast.error("You have to make the course unvailable in order to edit it.", {
-                position: "top-right",
-                autoClose: 5000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-              })
+              toast.error(
+                "You have to make the course unvailable in order to edit it.",
+                {
+                  position: "top-right",
+                  autoClose: 5000,
+                  hideProgressBar: false,
+                  closeOnClick: true,
+                  pauseOnHover: true,
+                  draggable: true,
+                  progress: undefined,
+                }
+              );
               return;
             }
-            this.setState({ showEditCourseModal: true}) 
+            this.setState({ showEditCourseModal: true });
           }}
         >
           Edit Course

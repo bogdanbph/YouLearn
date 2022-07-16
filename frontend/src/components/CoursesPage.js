@@ -97,7 +97,7 @@ class CoursesPage extends React.Component {
                       <div className="content-card">
                         <p className="description-card">
                           <h3>{course.courseName}</h3> (
-                          {course.numberOfChapters} chapters)
+                          {course.numberOfChapters} chapters) by {course.nameInstructor}
                         </p>
                         {/* <iframe onLoad={this.handleOnclick} id="java-vid" width="200" height="200" src={course.link} title={course.title} frameBorder={0} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>                         */}
                         <img
