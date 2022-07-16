@@ -27,7 +27,7 @@ public class Course {
     )
     private Long id;
 
-    @OneToMany(mappedBy = "course")
+    @OneToMany(mappedBy = "course", cascade = CascadeType.REMOVE)
     private Set<CourseEnrollment> enrollments;
 
     private String courseName;

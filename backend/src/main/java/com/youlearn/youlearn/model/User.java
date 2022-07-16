@@ -46,8 +46,8 @@ public class User implements UserDetails {
     private Boolean isLocked = false;
     private Boolean isEnabled = false;
 
-    @OneToMany(mappedBy = "user")
-    private Set<CourseEnrollment> enrollments;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    private transient Set<CourseEnrollment> enrollments;
 
     public User(String firstName, String lastName, String email, String password, UserRole role, String gender) {
         this.firstName = firstName;
