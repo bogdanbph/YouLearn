@@ -7,6 +7,7 @@ import "../styles/ProfilePage.css";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "../styles/ProfilePage.scss";
+import axios from "axios";
 
 class ProfilePage extends React.Component {
   constructor(props) {
@@ -22,6 +23,31 @@ class ProfilePage extends React.Component {
 
   loadFile(event) {
     var image = document.getElementById("profile-pic");
+
+    var file = event.target.files[0];
+    var reader = new FileReader();
+    reader.onloadend = function() {
+
+      var formData = new FormData();
+      formData.append("image", reader.result.split(",")[1])
+      axios({
+        method: "post",
+        url: "https://api.imgbb.com/1/upload?expiration=600&key=fed9731ce9cb5cc4d036915269a32220",
+        data: formData,
+        headers: { "Content-Type": "multipart/form-data" }
+      })
+      .then(res => {
+        const token = localStorage.getItem("token");
+        const email = localStorage.getItem("user");
+
+        UserService.updateProfilePicture(email, token, res.data.data.image.url)
+        .then()
+        .catch(err => {
+          console.log(err);
+        });
+      })
+    }
+    reader.readAsDataURL(file);
 
     if (event.target.files[0] !== undefined) {
       image.src = URL.createObjectURL(event.target.files[0]);
@@ -39,6 +65,8 @@ class ProfilePage extends React.Component {
           const username = res.data.username;
           const role = res.data.authorities[0].authority;
           const gender = res.data.gender;
+          const profilePicture = res.data.profilePicture;
+
           await UserService.retrieveCertifications(email, token).then((res) => {
             const certifications = res.data;
             this.setState({
@@ -50,13 +78,13 @@ class ProfilePage extends React.Component {
                     style={{ width: "18rem" }}
                   >
                     <div class="profile-pic">
-                      <label class="-label" for="file">
+                      <label class="-label" htmlFor="file">
                         <span class="glyphicon glyphicon-camera"></span>
                         <span>Change Image</span>
                       </label>
                       <input id="file" type="file" onChange={this.loadFile} />
 
-                      {gender.toLowerCase() === "male" ? (
+                      {profilePicture === null ? gender.toLowerCase() === "male" ? (
                         <img
                           src={stockprofilepic}
                           id="profile-pic"
@@ -70,7 +98,12 @@ class ProfilePage extends React.Component {
                           alt="Card Image Cap"
                           width="200"
                         />
-                      )}
+                      ) : <img
+                        src={profilePicture}
+                        id="profile-pic"
+                        alt="Card Image Cap"
+                        width="200"
+                      />}
                     </div>
 
                     <div className="card-body">

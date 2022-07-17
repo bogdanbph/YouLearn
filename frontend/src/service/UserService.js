@@ -17,6 +17,21 @@ class UserService {
     );
   }
 
+  updateProfilePicture(email, token, profilePicture) {
+    return axios.put(
+      USER_SERVICE_API_URL + "/profile",
+      new URLSearchParams({
+        email: email,
+        imgUrl: profilePicture
+      }),
+      {
+        headers: {
+          Authorization: "Bearer " + token,
+        },
+      }
+    );
+  }
+
   retrieveRoleForUser(email, token) {
     return axios.post(
       USER_SERVICE_API_URL + "/role",
