@@ -136,4 +136,17 @@ public class UserService implements UserDetailsService {
 
         return certificationDtos;
     }
+
+    public void updateUserProfilePicture(String imageUrl, String email) {
+        Optional<User> byEmail = userRepository.findByEmail(email);
+        if (byEmail.isPresent()) {
+            User user = byEmail.get();
+            user.setProfilePicture(imageUrl);
+
+            userRepository.save(user);
+        }
+        else {
+            throw new UsernameNotFoundException("There is no user with this email...");
+        }
+    }
 }

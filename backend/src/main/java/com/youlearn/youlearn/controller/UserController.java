@@ -7,10 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -36,5 +33,10 @@ public class UserController {
     @PostMapping("/certifications")
     public ResponseEntity<List<CertificationDto>> getCertificationsForUser(@RequestParam("email") String email) {
         return new ResponseEntity<>(userService.getCertificationsForUser(email), HttpStatus.OK);
+    }
+
+    @PutMapping("/profile")
+    public void updateUserProfilePicture(@RequestParam("imgUrl") String imageUrl, @RequestParam("email") String email) {
+        userService.updateUserProfilePicture(imageUrl, email);
     }
 }
