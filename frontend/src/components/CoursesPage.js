@@ -253,6 +253,19 @@ class CoursesPage extends React.Component {
       });
   };
 
+  clearModalDetails = () => {
+    this.setState({
+      modalDetails: {
+        email: localStorage.getItem("user"),
+        numberOfChapters: 0,
+        courseLink: "",
+        courseName: "",
+        price: 0.0,
+        description: "",
+      }
+    });
+  }
+
   handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -273,6 +286,7 @@ class CoursesPage extends React.Component {
         )
           .then((res) => {
             this.retrieveCourses();
+            this.clearModalDetails();
           })
           .catch((ex) => {
             const errorMessage =
